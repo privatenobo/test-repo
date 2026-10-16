@@ -7,18 +7,32 @@
     "modes": [
       {
         "name": "Create song",
-        "input_type": ["text_prompt", "tags_features", "lyrics"],
+        "input_type": [
+          "text_prompt",
+          "tags_features",
+          "lyrics"
+        ],
         "chronological": false,
-        "output_type": ["audio"],
+        "output_type": [
+          "audio"
+        ],
         "interaction": "no_direct_connection",
-        "length": { "unit": "seconds", "value": 480 },
+        "length": {
+          "unit": "seconds",
+          "value": 480
+        },
         "realtime": false
       },
       {
         "name": "Cover",
-        "input_type": ["tags_features", "audio"],
+        "input_type": [
+          "tags_features",
+          "audio"
+        ],
         "chronological": true,
-        "output_type": ["audio"],
+        "output_type": [
+          "audio"
+        ],
         "interaction": "altered_version",
         "length": null,
         "realtime": false
@@ -33,9 +47,15 @@
     "modes": [
       {
         "name": "Create song",
-        "input_type": ["text_prompt", "tags_features", "lyrics"],
+        "input_type": [
+          "text_prompt",
+          "tags_features",
+          "lyrics"
+        ],
         "chronological": false,
-        "output_type": ["audio"],
+        "output_type": [
+          "audio"
+        ],
         "interaction": "no_direct_connection",
         "length": null,
         "realtime": false
@@ -50,12 +70,38 @@
     "modes": [
       {
         "name": "Duet",
-        "input_type": ["performance_midi"],
+        "input_type": [
+          "performance_midi"
+        ],
         "chronological": false,
-        "output_type": ["performance_midi"],
+        "output_type": [
+          "performance_midi"
+        ],
         "interaction": "precedes",
         "length": null,
         "realtime": true
+      }
+    ]
+  },
+  {
+    "id": "test",
+    "name": "Test",
+    "status": "reviewed",
+    "modes": [
+      {
+        "name": "creates lyrics",
+        "input_type": [
+          "text_prompt"
+        ],
+        "chronological": false,
+        "output_type": [
+          "lyrics"
+        ],
+        "interaction": "accompanies",
+        "length": {
+          "unit": "unlimited"
+        },
+        "realtime": false
       }
     ]
   }
