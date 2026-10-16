@@ -1,5 +1,5 @@
 {
-  "version": "0.1",
+  "version": "0.2",
   "values": {
     "text_prompt": { "label": "Text prompt", "def": "Free text, e.g. “calm synth-pop with female vocals”." },
     "tags_features": { "label": "Tags/features", "def": "Preset parameters such as genre, tempo, key or mood." },
@@ -8,31 +8,36 @@
     "performance_midi": { "label": "Performance MIDI", "def": "MIDI with expressive timing and dynamics." },
     "audio": { "label": "Audio", "def": "Recorded or generated sound." },
     "accompanies": { "label": "Accompanies", "def": "Output plays along with the input." },
+    "precedes": { "label": "Precedes / Continuation", "def": "Output continues where the input ends, e.g. extends a melody or a track." },
     "altered_version": { "label": "Altered version of input", "def": "Output transforms the input." },
-    "no_direct_connection": { "label": "No direct connection", "def": "Input only guides content or style." }
+    "no_direct_connection": { "label": "No direct connection", "def": "Input only guides content or style." },
+    "beats": { "label": "Beats", "def": "Counted in beats.", "numeric": true },
+    "seconds": { "label": "Seconds", "def": "Counted in seconds.", "numeric": true },
+    "unlimited": { "label": "Unlimited", "def": "Runs on without a fixed end." }
   },
   "branches": [
     {
       "id": "input",
       "label": "Input",
       "dimensions": [
-        { "id": "input_type", "label": "Type", "kind": "multi", "values": ["text_prompt", "tags_features", "lyrics", "score", "performance_midi", "audio"] },
-        { "id": "chronological", "label": "Chronological?", "kind": "bool", "def": "Yes if the input has a timeline the output follows, e.g. a recording or MIDI track." }
+        { "id": "input_type", "label": "Type", "short": "Input", "kind": "multi", "values": ["text_prompt", "tags_features", "lyrics", "score", "performance_midi", "audio"] },
+        { "id": "chronological", "label": "Chronological along output?", "short": "Chronological", "kind": "bool", "def": "Yes if the input runs along the output's timeline, e.g. a recording or MIDI track the output follows." }
       ]
     },
     {
       "id": "output",
       "label": "Output",
       "dimensions": [
-        { "id": "output_type", "label": "Type", "kind": "multi", "values": ["lyrics", "score", "performance_midi", "audio"] },
-        { "id": "interaction", "label": "Interaction with input", "kind": "single", "values": ["accompanies", "altered_version", "no_direct_connection"] }
+        { "id": "output_type", "label": "Type", "short": "Output", "kind": "multi", "values": ["lyrics", "score", "performance_midi", "audio"] },
+        { "id": "interaction", "label": "Interaction with input", "short": "Interaction", "kind": "single", "values": ["accompanies", "precedes", "altered_version", "no_direct_connection"] },
+        { "id": "length", "label": "Length", "short": "Length", "kind": "length", "values": ["beats", "seconds", "unlimited"], "def": "Maximum length of one output." }
       ]
     },
     {
       "id": "other",
       "label": "Other features",
       "dimensions": [
-        { "id": "realtime", "label": "Real-time capable?", "kind": "bool", "def": "Yes if it responds fast enough to play live." }
+        { "id": "realtime", "label": "Real-time capable?", "short": "Real-time", "kind": "bool", "def": "Yes if it responds fast enough to play live." }
       ]
     }
   ]
