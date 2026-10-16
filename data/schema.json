@@ -1,115 +1,39 @@
 {
   "version": "0.1",
-  "status": "Entwurf für die Testversion. Die Definitionen sind noch nicht im Team abgestimmt.",
   "values": {
-    "text_prompt": {
-      "label": "Text-Prompt",
-      "label_en": "Text prompt",
-      "def": "Frei formulierte Beschreibung in natürlicher Sprache, etwa „ruhiger Synthpop mit weiblicher Stimme“."
-    },
-    "tags_features": {
-      "label": "Tags / Merkmale",
-      "label_en": "Tags/features",
-      "def": "Vorgegebene Parameter statt Freitext: Genre-Tags, Tempo, Tonart, Stimmung oder Instrumentierung."
-    },
-    "lyrics": {
-      "label": "Lyrics",
-      "label_en": "Lyrics",
-      "def": "Songtext, ob als Vorgabe für das System oder als sein Ergebnis."
-    },
-    "score": {
-      "label": "Partitur / Komposition",
-      "label_en": "Score/composition",
-      "def": "Symbolische Musik ohne Spielnuancen: Noten, Akkorde, Leadsheet oder quantisiertes MIDI."
-    },
-    "performance_midi": {
-      "label": "Performance-MIDI",
-      "label_en": "Performance MIDI",
-      "def": "MIDI mit den Nuancen eines Spiels: Timing-Abweichungen, Anschlagstärke, Pedal."
-    },
-    "audio": {
-      "label": "Audio",
-      "label_en": "Audio",
-      "def": "Klingendes Material: Aufnahme, Stem, Sample, Gesang oder fertiger Mix."
-    },
-    "accompanies": {
-      "label": "Begleitet den Input",
-      "label_en": "Accompanies",
-      "def": "Der Output erklingt zusammen mit dem Input: Begleitung, Drumspur, zweite Stimme."
-    },
-    "altered_version": {
-      "label": "Veränderte Version",
-      "label_en": "Altered version of input",
-      "def": "Der Output formt den Input um: Stiltransfer, Stimmkonvertierung, Re-Arrangement, Humanisierung."
-    },
-    "no_direct_connection": {
-      "label": "Keine direkte Verbindung",
-      "label_en": "No direct connection",
-      "def": "Der Input steuert Inhalt oder Stil, ist im Ergebnis aber weder enthalten noch läuft er mit."
-    }
+    "text_prompt": { "label": "Text prompt", "def": "Free text, e.g. “calm synth-pop with female vocals”." },
+    "tags_features": { "label": "Tags/features", "def": "Preset parameters such as genre, tempo, key or mood." },
+    "lyrics": { "label": "Lyrics", "def": "Song text." },
+    "score": { "label": "Score/composition", "def": "Notes, chords or quantized MIDI without performance nuance." },
+    "performance_midi": { "label": "Performance MIDI", "def": "MIDI with expressive timing and dynamics." },
+    "audio": { "label": "Audio", "def": "Recorded or generated sound." },
+    "accompanies": { "label": "Accompanies", "def": "Output plays along with the input." },
+    "altered_version": { "label": "Altered version of input", "def": "Output transforms the input." },
+    "no_direct_connection": { "label": "No direct connection", "def": "Input only guides content or style." }
   },
   "branches": [
     {
       "id": "input",
       "label": "Input",
-      "label_en": "Input",
       "dimensions": [
-        {
-          "id": "input_type",
-          "label": "Typ",
-          "label_en": "Type",
-          "kind": "multi",
-          "values": ["text_prompt", "tags_features", "lyrics", "score", "performance_midi", "audio"]
-        },
-        {
-          "id": "chronological",
-          "label": "Chronologisch?",
-          "label_en": "Chronological?",
-          "kind": "bool",
-          "def": "Ja, wenn der Input eine Zeitachse hat, an der sich der Output ausrichtet, etwa eine Aufnahme oder eine MIDI-Spur. Nein bei zeitlosen Vorgaben wie Prompts oder Tags."
-        }
+        { "id": "input_type", "label": "Type", "kind": "multi", "values": ["text_prompt", "tags_features", "lyrics", "score", "performance_midi", "audio"] },
+        { "id": "chronological", "label": "Chronological?", "kind": "bool", "def": "Yes if the input has a timeline the output follows, e.g. a recording or MIDI track." }
       ]
     },
     {
       "id": "output",
       "label": "Output",
-      "label_en": "Output",
       "dimensions": [
-        {
-          "id": "output_type",
-          "label": "Typ",
-          "label_en": "Type",
-          "kind": "multi",
-          "values": ["lyrics", "score", "performance_midi", "audio"]
-        },
-        {
-          "id": "interaction",
-          "label": "Bezug zum Input",
-          "label_en": "Interaction with input",
-          "kind": "single",
-          "values": ["accompanies", "altered_version", "no_direct_connection"]
-        }
+        { "id": "output_type", "label": "Type", "kind": "multi", "values": ["lyrics", "score", "performance_midi", "audio"] },
+        { "id": "interaction", "label": "Interaction with input", "kind": "single", "values": ["accompanies", "altered_version", "no_direct_connection"] }
       ]
     },
     {
       "id": "other",
-      "label": "Weitere Merkmale",
-      "label_en": "Other features",
+      "label": "Other features",
       "dimensions": [
-        {
-          "id": "realtime",
-          "label": "Echtzeitfähig?",
-          "label_en": "Real-time capable?",
-          "kind": "bool",
-          "def": "Ja, wenn das System schnell genug reagiert, um live mitzuspielen oder ohne spürbare Wartezeit gesteuert zu werden."
-        }
+        { "id": "realtime", "label": "Real-time capable?", "kind": "bool", "def": "Yes if it responds fast enough to play live." }
       ]
     }
-  ],
-  "open_questions": [
-    "Was genau heißt „chronologisch“: hat der Input eine Zeitachse, oder wird er fortlaufend verarbeitet? Im zweiten Fall überschneidet sich das mit „echtzeitfähig“.",
-    "Wohin gehören Fortsetzungen und Antworten (Call and Response)? Sie begleiten nicht, verändern nicht und sind trotzdem eng an den Input gebunden.",
-    "Eigene Lyrics, die gesungen werden: keine direkte Verbindung oder Begleitung?",
-    "Wird pro Anwendung oder pro Funktion (Modus) eingeordnet? Die Testversion ordnet pro Modus ein."
   ]
 }
