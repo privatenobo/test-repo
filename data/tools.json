@@ -3,33 +3,24 @@
     "id": "suno",
     "name": "Suno",
     "url": "https://suno.com",
-    "status": "reviewed",
+    "status": "example",
     "modes": [
       {
         "name": "Create song",
-        "input_type": [
-          "text_prompt",
-          "tags_features",
-          "lyrics"
-        ],
+        "input_type": ["text_prompt", "tags_features", "lyrics"],
         "chronological": false,
-        "output_type": [
-          "audio"
-        ],
+        "output_type": ["audio"],
         "interaction": "no_direct_connection",
+        "length": { "unit": "seconds", "value": 480 },
         "realtime": false
       },
       {
         "name": "Cover",
-        "input_type": [
-          "tags_features",
-          "audio"
-        ],
+        "input_type": ["tags_features", "audio"],
         "chronological": true,
-        "output_type": [
-          "audio"
-        ],
+        "output_type": ["audio"],
         "interaction": "altered_version",
+        "length": null,
         "realtime": false
       }
     ]
@@ -38,20 +29,15 @@
     "id": "udio",
     "name": "Udio",
     "url": "https://www.udio.com",
-    "status": "reviewed",
+    "status": "example",
     "modes": [
       {
         "name": "Create song",
-        "input_type": [
-          "text_prompt",
-          "tags_features",
-          "lyrics"
-        ],
+        "input_type": ["text_prompt", "tags_features", "lyrics"],
         "chronological": false,
-        "output_type": [
-          "audio"
-        ],
+        "output_type": ["audio"],
         "interaction": "no_direct_connection",
+        "length": null,
         "realtime": false
       }
     ]
@@ -60,38 +46,16 @@
     "id": "ai-duet",
     "name": "A.I. Duet",
     "url": "https://experiments.withgoogle.com/ai-duet",
-    "status": "reviewed",
+    "status": "example",
     "modes": [
       {
         "name": "Duet",
-        "input_type": [
-          "performance_midi"
-        ],
-        "chronological": true,
-        "output_type": [
-          "performance_midi"
-        ],
-        "interaction": "accompanies",
-        "realtime": true
-      }
-    ]
-  },
-  {
-    "id": "aiode",
-    "name": "AIODE",
-    "status": "reviewed",
-    "modes": [
-      {
-        "name": "create stems",
-        "input_type": [
-          "audio"
-        ],
+        "input_type": ["performance_midi"],
         "chronological": false,
-        "output_type": [
-          "audio"
-        ],
-        "interaction": "accompanies",
-        "realtime": false
+        "output_type": ["performance_midi"],
+        "interaction": "precedes",
+        "length": null,
+        "realtime": true
       }
     ]
   }
