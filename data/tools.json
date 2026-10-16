@@ -1,0 +1,157 @@
+[
+  {
+    "id": "suno",
+    "name": "Suno",
+    "anbieter": "Suno, Inc.",
+    "url": "https://suno.com",
+    "beschreibung": "Erzeugt vollständige Songs mit Gesang aus einer Beschreibung, Stil-Tags und Lyrics.",
+    "status": "beispiel",
+    "modi": [
+      {
+        "name": "Song erstellen",
+        "input_type": ["text_prompt", "tags_features", "lyrics"],
+        "chronological": false,
+        "output_type": ["audio"],
+        "interaction": "no_direct_connection",
+        "realtime": false,
+        "notiz": "Grenzfall: Eigene Lyrics werden gesungen. Ist das „keine direkte Verbindung“ oder „begleitet“?"
+      },
+      {
+        "name": "Lyrics schreiben",
+        "input_type": ["text_prompt"],
+        "chronological": false,
+        "output_type": ["lyrics"],
+        "interaction": "no_direct_connection",
+        "realtime": false
+      },
+      {
+        "name": "Cover",
+        "input_type": ["audio", "tags_features"],
+        "chronological": true,
+        "output_type": ["audio"],
+        "interaction": "altered_version",
+        "realtime": false
+      }
+    ]
+  },
+  {
+    "id": "musicgen",
+    "name": "MusicGen",
+    "anbieter": "Meta (AudioCraft)",
+    "url": "https://github.com/facebookresearch/audiocraft",
+    "beschreibung": "Open-Source-Modell, das Musik aus Textbeschreibungen erzeugt, auf Wunsch geführt von einer Melodie.",
+    "status": "beispiel",
+    "modi": [
+      {
+        "name": "Text zu Musik",
+        "input_type": ["text_prompt"],
+        "chronological": false,
+        "output_type": ["audio"],
+        "interaction": "no_direct_connection",
+        "realtime": false
+      },
+      {
+        "name": "Melodie-Konditionierung",
+        "input_type": ["text_prompt", "audio"],
+        "chronological": true,
+        "output_type": ["audio"],
+        "interaction": "altered_version",
+        "realtime": false,
+        "notiz": "Die Melodie bleibt erhalten, Klang und Arrangement werden neu erzeugt."
+      }
+    ]
+  },
+  {
+    "id": "magenta-realtime",
+    "name": "Magenta RealTime",
+    "anbieter": "Google (Magenta)",
+    "url": "https://magenta.tensorflow.org/magenta-realtime-2",
+    "beschreibung": "Offenes Live-Musikmodell, das fortlaufend Audio erzeugt und sich während des Spielens per Text oder Audio umsteuern lässt.",
+    "status": "beispiel",
+    "modi": [
+      {
+        "name": "Live-Generierung",
+        "input_type": ["text_prompt", "audio"],
+        "chronological": false,
+        "output_type": ["audio"],
+        "interaction": "no_direct_connection",
+        "realtime": true,
+        "notiz": "Audio dient hier als Stilvorgabe, nicht als Spur, an der sich der Output ausrichtet."
+      }
+    ]
+  },
+  {
+    "id": "magenta-studio",
+    "name": "Magenta Studio",
+    "anbieter": "Google (Magenta)",
+    "url": "https://magenta.tensorflow.org/studio",
+    "beschreibung": "Sammlung von MIDI-Werkzeugen, als Plugin für Ableton Live oder als eigenständige App.",
+    "status": "beispiel",
+    "modi": [
+      {
+        "name": "Continue",
+        "input_type": ["score"],
+        "chronological": true,
+        "output_type": ["score"],
+        "interaction": "no_direct_connection",
+        "realtime": false,
+        "notiz": "Grenzfall: Eine Fortsetzung passt in keine der drei Bezugs-Kategorien eindeutig."
+      },
+      {
+        "name": "Drumify",
+        "input_type": ["score"],
+        "chronological": true,
+        "output_type": ["performance_midi"],
+        "interaction": "accompanies",
+        "realtime": false
+      },
+      {
+        "name": "Groove",
+        "input_type": ["score"],
+        "chronological": true,
+        "output_type": ["performance_midi"],
+        "interaction": "altered_version",
+        "realtime": false,
+        "notiz": "Macht aus quantisierten Drums ein menschlich gespieltes Pattern."
+      }
+    ]
+  },
+  {
+    "id": "rvc",
+    "name": "RVC",
+    "anbieter": "RVC-Project (Open Source)",
+    "url": "https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI",
+    "beschreibung": "Retrieval-based Voice Conversion wandelt eine Gesangs- oder Sprachaufnahme in eine andere Stimme um.",
+    "status": "beispiel",
+    "modi": [
+      {
+        "name": "Stimmkonvertierung",
+        "input_type": ["audio"],
+        "chronological": true,
+        "output_type": ["audio"],
+        "interaction": "altered_version",
+        "realtime": true,
+        "notiz": "Echtzeit über den Live-Modus der WebUI."
+      }
+    ]
+  },
+  {
+    "id": "ai-duet",
+    "name": "A.I. Duet",
+    "anbieter": "Google Creative Lab",
+    "url": "https://experiments.withgoogle.com/ai-duet",
+    "beschreibung": "Browser-Experiment: Man spielt ein paar Töne am Keyboard, die KI antwortet mit einer eigenen Phrase.",
+    "status": "beispiel",
+    "modi": [
+      {
+        "name": "Duett",
+        "input_type": ["performance_midi"],
+        "chronological": true,
+        "output_type": ["performance_midi"],
+        "interaction": "accompanies",
+        "realtime": true,
+        "notiz": "Grenzfall: Die KI antwortet, statt gleichzeitig zu begleiten."
+      }
+    ]
+  }
+]
