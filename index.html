@@ -5,15 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Music AI Schema</title>
 <meta name="description" content="An open schema to classify music AI tools by their properties.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500&family=Geist+Mono:wght@400&display=swap">
 <style>
-/* Three panels side by side: steps | schema | tools. Black on white, hairline boxes. */
+/* Three panels side by side: about and contribute | schema | tools. Black on white, hairline boxes. */
 :root{
   --bg:#FFFFFF; --fg:#000000; --grey:#6B6B6B; --soft:#EFEFEF; --hair:#D4D4D4;
-  --sans:"Geist","Helvetica Neue",Helvetica,Arial,sans-serif;
-  --mono:"Geist Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --sans:"Helvetica Neue",Helvetica,Arial,system-ui,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
   --stroke:1.5px;
 }
 *{box-sizing:border-box}
@@ -26,30 +23,14 @@ a{color:inherit}
 .app{display:grid;grid-template-columns:minmax(260px,.85fr) minmax(0,1.15fr) minmax(0,1.15fr);gap:28px;height:100vh;height:100dvh;padding:28px max(28px,env(safe-area-inset-right)) 28px max(28px,env(safe-area-inset-left))}
 
 /* Left column */
-.intro{display:flex;flex-direction:column;min-height:0;overflow:auto;padding-right:4px}
+.intro{display:flex;flex-direction:column;gap:36px;min-height:0;overflow:auto}
 h1{font:500 clamp(1.7rem,2.3vw,2.4rem)/1 var(--sans);letter-spacing:.01em;text-transform:uppercase;margin:0}
 .lede{margin:14px 0 0;max-width:34ch}
-.steps{list-style:none;margin:44px 0 0;padding:0;display:grid;gap:36px}
-.step{position:relative;padding-left:32px}
-.step:not(:last-child)::after{content:"";position:absolute;left:6px;top:17px;bottom:-36px;width:var(--stroke);background:var(--fg)}
-.marker{position:absolute;left:0;top:3px;width:14px;height:14px;border-radius:50%;border:var(--stroke) solid var(--fg);background:var(--bg);display:grid;place-items:center;color:var(--bg);font:500 9px/1 var(--sans)}
-.step[data-state="current"] .marker,.step[data-state="done"] .marker{background:var(--fg)}
-.step[data-state="done"] .marker::before{content:"✓"}
-.step h2{font:500 1.15rem var(--sans);margin:0}
-.step p{margin:4px 0 12px;color:var(--grey);font-size:.9rem}
-.step[data-state="done"] h2{color:var(--grey)}
-.btn{display:block;width:100%;text-align:center;padding:.75em 1em;font:500 .9rem var(--sans);border:var(--stroke) solid var(--fg);background:var(--bg);color:var(--fg);cursor:pointer;text-decoration:none;border-radius:0}
-.btn:hover{background:var(--fg);color:var(--bg)}
-.btn.is-muted{background:var(--grey);border-color:var(--grey);color:var(--bg)}
-.btn.is-muted:hover{background:var(--fg);border-color:var(--fg)}
-.error{margin:10px 0 0;font-size:.85rem;font-weight:500}
-.error::before{content:"! "}
-.intro-foot{margin-top:auto;padding-top:14px;border-top:var(--stroke) solid var(--fg);display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center;font-size:.85rem}
-.intro-foot .version{margin-left:auto;color:var(--grey);font:400 .75rem var(--mono)}
-.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor:pointer}
-.link:hover{text-decoration:underline}
-.json-out{margin:10px 0 0;max-height:180px;overflow:auto;font:400 .72rem/1.5 var(--mono);border:var(--stroke) solid var(--fg);padding:10px;white-space:pre}
-.intro-top{margin-bottom:0}
+.label{font:400 .76rem var(--mono);color:var(--grey);margin:0}
+.how-head{display:flex;justify-content:space-between;gap:12px;margin-bottom:10px}
+.how-list{display:grid;grid-template-columns:88px minmax(0,1fr);gap:8px 12px;margin:0;font-size:.9rem}
+.how-list dt{font-weight:500}
+.how-list dd{margin:0;color:var(--grey)}
 
 /* Panels */
 .panel{border:var(--stroke) solid var(--fg);display:flex;flex-direction:column;min-height:0;min-width:0}
@@ -59,6 +40,28 @@ h1{font:500 clamp(1.7rem,2.3vw,2.4rem)/1 var(--sans);letter-spacing:.01em;text-t
 .panel-foot{border-top:var(--stroke) solid var(--fg);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:16px;min-height:58px}
 .def{margin:0;font-size:.85rem;color:var(--grey)}
 .def b{color:var(--fg);font-weight:500}
+
+/* Contribute */
+.contribute{margin-top:auto;flex:none}
+.contribute .panel-body{overflow:visible}
+#contrib-classify{display:grid;gap:12px}
+.btn{display:block;width:100%;text-align:center;padding:.75em 1em;font:500 .9rem var(--sans);border:var(--stroke) solid var(--fg);background:var(--bg);color:var(--fg);cursor:pointer;text-decoration:none;border-radius:0}
+.btn:hover{background:var(--fg);color:var(--bg)}
+.btn.is-muted{background:var(--grey);border-color:var(--grey);color:var(--bg)}
+.btn.is-muted:hover{background:var(--fg);border-color:var(--fg)}
+.note{margin:0;font-size:.82rem;color:var(--grey)}
+.status{margin:0;font-size:.85rem;color:var(--grey)}
+.status.is-ready{color:var(--fg)}
+.status.is-alert{color:var(--fg);font-weight:500}
+.links{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.85rem}
+.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor:pointer}
+.link:hover{text-decoration:underline}
+.json-out{margin:0;max-height:180px;overflow:auto;font:400 .72rem/1.5 var(--mono);border:var(--stroke) solid var(--fg);padding:10px;white-space:pre}
+
+/* Fields */
+.field{display:grid;gap:2px}
+.field label{font:400 .76rem var(--mono);color:var(--grey)}
+.field input{width:100%;font:inherit;font-size:1rem;color:var(--fg);background:transparent;border:0;border-bottom:var(--stroke) solid var(--fg);border-radius:0;padding:.35em 0}
 
 /* Schema */
 .branch + .branch{margin-top:20px;padding-top:16px;border-top:1px solid var(--hair)}
@@ -77,12 +80,6 @@ h1{font:500 clamp(1.7rem,2.3vw,2.4rem)/1 var(--sans);letter-spacing:.01em;text-t
 .modebar-row{display:flex;gap:16px;align-items:flex-end}
 .modebar-row .field{flex:1}
 
-/* Fields */
-.field{display:grid;gap:2px}
-.field label{font:400 .76rem var(--mono);color:var(--grey)}
-.field input{width:100%;font:inherit;font-size:1rem;color:var(--fg);background:transparent;border:0;border-bottom:var(--stroke) solid var(--fg);border-radius:0;padding:.35em 0}
-.fields{display:grid;gap:14px;margin-bottom:26px}
-
 /* Tool list */
 .search{margin-bottom:6px}
 .tool{padding:18px 0;border-bottom:1px solid var(--hair)}
@@ -92,7 +89,6 @@ h1{font:500 clamp(1.7rem,2.3vw,2.4rem)/1 var(--sans);letter-spacing:.01em;text-t
 .tool-name a{text-decoration:none}
 .tool-name a:hover{text-decoration:underline}
 .tag{font:400 .74rem var(--mono);color:var(--grey);white-space:nowrap}
-.tool-meta{margin:6px 0 0;color:var(--grey);font-size:.88rem}
 .mode{margin-top:14px;transition:opacity .2s}
 .mode.is-dim{opacity:.28}
 .mode-name{font:400 .76rem var(--mono);color:var(--grey);margin:0 0 4px}
@@ -101,13 +97,11 @@ h1{font:500 clamp(1.7rem,2.3vw,2.4rem)/1 var(--sans);letter-spacing:.01em;text-t
 .kv dd{margin:0}
 .missing{color:var(--grey)}
 .empty{color:var(--grey);margin:18px 0 0}
-.preview-label{font:400 .76rem var(--mono);color:var(--grey);margin:0;padding-top:14px;border-top:var(--stroke) solid var(--fg)}
-.preview .tool{padding-top:10px}
+#preview .tool{padding-top:0}
 
 @media (max-width:999px){
   .app{grid-template-columns:1fr;height:auto;gap:24px}
   .intro,.panel-body{overflow:visible}
-  .intro-foot{margin-top:28px}
 }
 @media (prefers-reduced-motion:reduce){.mode{transition:none}}
 </style>
@@ -116,36 +110,43 @@ h1{font:500 clamp(1.7rem,2.3vw,2.4rem)/1 var(--sans);letter-spacing:.01em;text-t
 <div class="app">
 
   <aside class="intro">
-    <h1>Music AI Schema</h1>
-    <p class="lede">An open project to classify current music AI tools by their properties. Anyone can contribute.</p>
-
-    <ol class="steps">
-      <li class="step" id="step-1" data-state="current">
-        <span class="marker" aria-hidden="true"></span>
-        <h2>Step 1</h2>
-        <p>Select the tool's properties in the schema.</p>
-        <button type="button" class="btn" id="btn-classify">Classify a tool</button>
-      </li>
-      <li class="step" id="step-2" data-state="todo">
-        <span class="marker" aria-hidden="true"></span>
-        <h2>Step 2</h2>
-        <p>Submit it as a GitHub issue. Requires a free GitHub account.</p>
-        <a class="btn is-muted" id="btn-submit" href="#" target="_blank" rel="noopener">Submit on GitHub</a>
-        <p class="error" id="err" role="alert" hidden></p>
-      </li>
-      <li class="step" id="step-3" data-state="todo">
-        <span class="marker" aria-hidden="true"></span>
-        <h2>Step 3</h2>
-        <p>After review, the tool is added to the list.</p>
-      </li>
-    </ol>
-
-    <div class="intro-foot">
-      <button type="button" class="link" id="btn-reset" hidden>↺ Start over</button>
-      <button type="button" class="link" id="btn-copy" hidden>Copy record</button>
-      <span class="version">v<span id="version">0.1</span></span>
+    <div>
+      <h1>Music AI Schema</h1>
+      <p class="lede">An open project to classify current music AI tools by their properties. Anyone can contribute.</p>
     </div>
-    <pre class="json-out" id="json-out" tabindex="0" hidden></pre>
+
+    <section aria-label="How it works">
+      <div class="how-head"><p class="label">how it works</p><p class="label">v<span id="version">0.1</span></p></div>
+      <dl class="how-list">
+        <dt>Schema</dt><dd>Each tool is described by its input, its output and other features. A tool with several functions gets one mode per function.</dd>
+        <dt>Browse</dt><dd>Click properties in the schema to filter the tools.</dd>
+        <dt>Contribute</dt><dd>Classify a tool and submit it on GitHub. It is added to the list after review.</dd>
+      </dl>
+    </section>
+
+    <section class="panel contribute" aria-label="Contribute">
+      <header class="panel-head"><span>contribute</span><span class="aside" id="contrib-aside">github</span></header>
+      <div class="panel-body">
+        <div id="contrib-browse">
+          <button type="button" class="btn" id="btn-classify">Classify a tool</button>
+        </div>
+        <div id="contrib-classify" hidden>
+          <div class="field">
+            <label for="f-name">tool name *</label>
+            <input id="f-name" type="text" autocomplete="off" maxlength="80">
+          </div>
+          <p class="status" id="status" aria-live="polite"></p>
+          <a class="btn is-muted" id="btn-submit" href="#" target="_blank" rel="noopener">Submit on GitHub</a>
+          <p class="note">Requires a free GitHub account. Your GitHub username is shown publicly on the issue.</p>
+          <div class="links">
+            <button type="button" class="link" id="btn-cancel">Cancel</button>
+            <button type="button" class="link" id="btn-reset">Start over</button>
+            <button type="button" class="link" id="btn-copy">Copy record</button>
+          </div>
+          <pre class="json-out" id="json-out" tabindex="0" hidden></pre>
+        </div>
+      </div>
+    </section>
   </aside>
 
   <section class="panel" id="schema-panel" aria-label="Schema">
@@ -170,17 +171,7 @@ h1{font:500 clamp(1.7rem,2.3vw,2.4rem)/1 var(--sans);letter-spacing:.01em;text-t
         </div>
         <div id="tool-list"></div>
       </div>
-
-      <div id="entry-view" hidden>
-        <form class="fields" id="entry-form" novalidate>
-          <div class="field"><label for="f-name">name *</label><input id="f-name" data-field="name" type="text" autocomplete="off"></div>
-          <div class="field"><label for="f-provider">provider</label><input id="f-provider" data-field="provider" type="text" autocomplete="off"></div>
-          <div class="field"><label for="f-url">website</label><input id="f-url" data-field="url" type="url" autocomplete="off" placeholder="https://"></div>
-          <div class="field"><label for="f-description">description</label><input id="f-description" data-field="description" type="text" autocomplete="off"></div>
-        </form>
-        <p class="preview-label">preview</p>
-        <div class="preview" id="entry-preview"></div>
-      </div>
+      <div id="preview" hidden></div>
     </div>
   </section>
 
@@ -195,17 +186,15 @@ h1{font:500 clamp(1.7rem,2.3vw,2.4rem)/1 var(--sans);letter-spacing:.01em;text-t
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
   const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-  const wide = window.matchMedia("(min-width: 1000px)");
 
   let SCHEMA = null, TOOLS = [], DIMS = [];
   let mode = "browse";
   const filters = {};
   let query = "";
   const emptyMode = () => ({ name: "", input_type: [], chronological: null, output_type: [], interaction: null, realtime: null });
-  const emptyDraft = () => ({ name: "", provider: "", url: "", description: "", modes: [emptyMode()] });
+  const emptyDraft = () => ({ name: "", modes: [emptyMode()] });
   let draft = emptyDraft();
   let active = 0;
-  let showErrors = false;
 
   const val = id => (SCHEMA.values[id] || { label: id, def: "" });
   const dim = id => DIMS.find(d => d.id === id);
@@ -235,8 +224,6 @@ h1{font:500 clamp(1.7rem,2.3vw,2.4rem)/1 var(--sans);letter-spacing:.01em;text-t
     $("#version").textContent = SCHEMA.version;
     renderSchema();
     bind();
-    renderTools();
-    updateEntry();
     updateUI();
   }
 
@@ -310,20 +297,18 @@ h1{font:500 clamp(1.7rem,2.3vw,2.4rem)/1 var(--sans);letter-spacing:.01em;text-t
   function toolHtml(t, matchFn) {
     const u = safeUrl(t.url);
     const name = esc(t.name || "Tool name");
-    const meta = [t.provider, t.description].filter(Boolean).map(esc).join(" · ");
     return `<article class="tool">
       <div class="tool-head">
         <h3 class="tool-name">${u ? `<a href="${esc(u.href)}" target="_blank" rel="noopener">${name} ↗</a>` : name}</h3>
         ${STATUS[t.status] ? `<span class="tag">${STATUS[t.status]}</span>` : ""}
       </div>
-      ${meta ? `<p class="tool-meta">${meta}</p>` : ""}
       ${(t.modes || []).map(m => modeHtml(m, matchFn ? !matchFn(m) : false)).join("")}
     </article>`;
   }
   function renderTools() {
     const act = activeFilters();
     const matchFn = act.length ? m => modeMatches(m, act) : null;
-    const searchOk = t => !query || [t.name, t.provider, t.description, ...(t.modes || []).map(m => m.name)].join(" ").toLowerCase().includes(query);
+    const searchOk = t => !query || [t.name, ...(t.modes || []).map(m => m.name)].join(" ").toLowerCase().includes(query);
     const shown = TOOLS.filter(t => searchOk(t) && (!matchFn || (t.modes || []).some(matchFn)));
     $("#tool-list").innerHTML = shown.length ? shown.map(t => toolHtml(t, matchFn)).join("") : `<p class="empty">No tool matches.</p>`;
     $("#list-aside").textContent = mode === "browse" ? (act.length || query ? `${shown.length} / ${TOOLS.length}` : String(TOOLS.length)) : "draft";
@@ -343,22 +328,23 @@ h1{font:500 clamp(1.7rem,2.3vw,2.4rem)/1 var(--sans);letter-spacing:.01em;text-t
   const sortBySchema = (arr, d) => [...arr].sort((a, b) => d.values.indexOf(a) - d.values.indexOf(b));
   const slug = s => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
   function buildEntry() {
-    const e = { id: slug(draft.name) || "unnamed", name: draft.name.trim() };
-    ["provider", "url", "description"].forEach(k => { if (draft[k].trim()) e[k] = draft[k].trim(); });
-    e.status = "submitted";
-    e.modes = draft.modes.map((m, i) => ({
-      name: m.name.trim() || `Mode ${i + 1}`,
-      input_type: sortBySchema(m.input_type, dim("input_type")),
-      chronological: m.chronological,
-      output_type: sortBySchema(m.output_type, dim("output_type")),
-      interaction: m.interaction,
-      realtime: m.realtime
-    }));
-    return e;
+    return {
+      id: slug(draft.name) || "unnamed",
+      name: draft.name.trim(),
+      status: "submitted",
+      modes: draft.modes.map((m, i) => ({
+        name: m.name.trim() || `Mode ${i + 1}`,
+        input_type: sortBySchema(m.input_type, dim("input_type")),
+        chronological: m.chronological,
+        output_type: sortBySchema(m.output_type, dim("output_type")),
+        interaction: m.interaction,
+        realtime: m.realtime
+      }))
+    };
   }
   function problems() {
     const out = [];
-    if (!draft.name.trim()) out.push("name");
+    if (!draft.name.trim()) out.push("tool name");
     draft.modes.forEach((m, i) => {
       const miss = [];
       if (!m.input_type.length) miss.push("input type");
@@ -376,9 +362,6 @@ h1{font:500 clamp(1.7rem,2.3vw,2.4rem)/1 var(--sans);letter-spacing:.01em;text-t
     const rows = entry.modes.map(m => `| ${m.name} | ${labels(m.input_type)} | ${y(m.chronological)} | ${labels(m.output_type)} | ${m.interaction ? val(m.interaction).label : "–"} | ${y(m.realtime)} |`);
     const body = [
       `**Tool:** ${entry.name}`,
-      entry.provider ? `**Provider:** ${entry.provider}` : "",
-      entry.url ? `**Website:** ${entry.url}` : "",
-      entry.description ? `**Description:** ${entry.description}` : "",
       "",
       "| Mode | Input | Chronological | Output | Interaction | Real-time |",
       "|---|---|---|---|---|---|",
@@ -388,20 +371,20 @@ h1{font:500 clamp(1.7rem,2.3vw,2.4rem)/1 var(--sans);letter-spacing:.01em;text-t
       "```json",
       JSON.stringify(entry, null, 2),
       "```"
-    ].filter((l, i, a) => l !== "" || a[i - 1] !== "").join("\n");
+    ].join("\n");
     return `https://github.com/${REPO}/issues/new?${new URLSearchParams({ title: `New tool: ${entry.name}`, body })}`;
   }
   function updateEntry() {
     const entry = buildEntry();
-    $("#entry-preview").innerHTML = toolHtml({ ...entry, name: entry.name || "Tool name", status: "" });
+    const p = problems();
+    $("#preview").innerHTML = toolHtml({ ...entry, name: entry.name || "Tool name", status: "" });
     $("#json-out").textContent = JSON.stringify(entry, null, 2);
-    $("#btn-submit").href = mode === "classify" && REPO ? issueUrl(entry) : "#";
-    if (showErrors) {
-      const p = problems();
-      $("#err").hidden = !p.length;
-      $("#err").textContent = p.length ? `Missing: ${p.join("; ")}.` : "";
-    }
-    updateSteps();
+    $("#btn-submit").href = REPO && !p.length ? issueUrl(entry) : "#";
+    $("#btn-submit").classList.toggle("is-muted", p.length > 0);
+    const status = $("#status");
+    status.classList.toggle("is-ready", !p.length);
+    status.classList.remove("is-alert");
+    status.textContent = p.length ? `Missing: ${p.join("; ")}.` : "Ready to submit.";
   }
 
   /* ---------- Mode bar ---------- */
@@ -413,30 +396,23 @@ h1{font:500 clamp(1.7rem,2.3vw,2.4rem)/1 var(--sans);letter-spacing:.01em;text-t
         <button type="button" class="tab tab-add" id="add-mode">+ mode</button>
       </div>
       <div class="modebar-row">
-        <div class="field"><label for="mode-name">mode name, e.g. create song</label><input id="mode-name" type="text" autocomplete="off" value="${esc(m.name)}"></div>
+        <div class="field"><label for="mode-name">mode name, e.g. create song</label><input id="mode-name" type="text" autocomplete="off" maxlength="60" value="${esc(m.name)}"></div>
         ${draft.modes.length > 1 ? `<button type="button" class="link" id="remove-mode">Remove</button>` : ""}
       </div>`;
   }
 
   /* ---------- UI state ---------- */
-  function updateSteps() {
-    const valid = !problems().length;
-    const states = mode === "browse" ? ["current", "todo", "todo"] : valid ? ["done", "current", "todo"] : ["current", "todo", "todo"];
-    states.forEach((s, i) => ($(`#step-${i + 1}`).dataset.state = s));
-    $("#btn-classify").classList.toggle("is-muted", mode === "classify");
-    $("#btn-submit").classList.toggle("is-muted", !(mode === "classify" && valid));
-  }
   function updateUI() {
     const c = mode === "classify";
-    $("#btn-classify").textContent = c ? "Back to tools" : "Classify a tool";
+    $("#contrib-browse").hidden = c;
+    $("#contrib-classify").hidden = !c;
+    $("#contrib-aside").textContent = c ? "draft" : "github";
     $("#schema-aside").textContent = c ? "click to classify" : "click to filter";
-    $("#list-title").textContent = c ? "your_entry" : "tools";
+    $("#list-title").textContent = c ? "preview" : "tools";
     $("#tools-view").hidden = c;
-    $("#entry-view").hidden = !c;
+    $("#preview").hidden = !c;
     $("#modebar").hidden = !c;
-    $("#btn-reset").hidden = !c;
-    $("#btn-copy").hidden = !c;
-    if (!c) { $("#json-out").hidden = true; $("#err").hidden = true; }
+    $("#json-out").hidden = true;
     if (c) renderModebar();
     refreshChips();
     renderTools();
@@ -445,10 +421,7 @@ h1{font:500 clamp(1.7rem,2.3vw,2.4rem)/1 var(--sans);letter-spacing:.01em;text-t
   function setMode(next) {
     mode = next;
     updateUI();
-    if (next === "classify") {
-      if (wide.matches) $("#f-name").focus();
-      else $("#schema-panel").scrollIntoView({ behavior: "smooth", block: "start" });
-    }
+    if (next === "classify") $("#f-name").focus();
   }
 
   /* ---------- Events ---------- */
@@ -495,9 +468,7 @@ h1{font:500 clamp(1.7rem,2.3vw,2.4rem)/1 var(--sans);letter-spacing:.01em;text-t
       updateEntry();
     });
 
-    $("#entry-form").addEventListener("submit", e => e.preventDefault());
-    $$("[data-field]", $("#entry-form")).forEach(inp =>
-      inp.addEventListener("input", () => { draft[inp.dataset.field] = inp.value; updateEntry(); }));
+    $("#f-name").addEventListener("input", e => { draft.name = e.target.value; updateEntry(); });
 
     $("#search").addEventListener("input", e => { query = e.target.value.trim().toLowerCase(); renderTools(); });
     $("#btn-clear").addEventListener("click", () => {
@@ -506,27 +477,26 @@ h1{font:500 clamp(1.7rem,2.3vw,2.4rem)/1 var(--sans);letter-spacing:.01em;text-t
       refreshChips(); renderTools();
     });
 
-    $("#btn-classify").addEventListener("click", () => setMode(mode === "browse" ? "classify" : "browse"));
+    $("#btn-classify").addEventListener("click", () => setMode("classify"));
+    $("#btn-cancel").addEventListener("click", () => setMode("browse"));
     $("#btn-submit").addEventListener("click", e => {
-      if (mode === "browse") { e.preventDefault(); setMode("classify"); return; }
-      showErrors = true;
-      const p = problems();
-      if (p.length) {
+      const status = $("#status");
+      if (problems().length) {
         e.preventDefault();
-        $("#err").textContent = `Missing: ${p.join("; ")}.`;
-        $("#err").hidden = false;
+        status.classList.add("is-alert");
+        if (!draft.name.trim()) $("#f-name").focus();
         return;
       }
       if (!REPO) {
         e.preventDefault();
-        $("#err").textContent = "Repository unknown here. Use Copy record instead.";
-        $("#err").hidden = false;
+        status.textContent = "Repository unknown here. Use Copy record instead.";
+        status.classList.add("is-alert");
       }
     });
     $("#btn-reset").addEventListener("click", () => {
-      draft = emptyDraft(); active = 0; showErrors = false;
-      $$("[data-field]", $("#entry-form")).forEach(inp => (inp.value = ""));
-      $("#err").hidden = true; $("#json-out").hidden = true;
+      draft = emptyDraft(); active = 0;
+      $("#f-name").value = "";
+      $("#json-out").hidden = true;
       renderModebar(); refreshChips(); updateEntry();
     });
     $("#btn-copy").addEventListener("click", () => {
