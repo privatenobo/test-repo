@@ -3,7 +3,7 @@
     "id": "suno",
     "name": "Suno",
     "url": "https://suno.com",
-    "status": "example",
+    "status": "reviewed",
     "modes": [
       {
         "name": "Create song",
@@ -38,7 +38,7 @@
     "id": "udio",
     "name": "Udio",
     "url": "https://www.udio.com",
-    "status": "example",
+    "status": "reviewed",
     "modes": [
       {
         "name": "Create song",
@@ -60,7 +60,7 @@
     "id": "ai-duet",
     "name": "A.I. Duet",
     "url": "https://experiments.withgoogle.com/ai-duet",
-    "status": "example",
+    "status": "reviewed",
     "modes": [
       {
         "name": "Duet",
@@ -73,25 +73,6 @@
         ],
         "interaction": "accompanies",
         "realtime": true
-      }
-    ]
-  },
-  {
-    "id": "test-tool",
-    "name": "Test Tool",
-    "status": "reviewed",
-    "modes": [
-      {
-        "name": "automatische erkennung",
-        "input_type": [
-          "text_prompt"
-        ],
-        "chronological": false,
-        "output_type": [
-          "lyrics"
-        ],
-        "interaction": "accompanies",
-        "realtime": false
       }
     ]
   },
