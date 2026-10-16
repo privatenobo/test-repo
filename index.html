@@ -61,7 +61,7 @@ h1{font:500 clamp(1.7rem,2.3vw,2.4rem)/1 var(--sans);letter-spacing:.01em;text-t
 /* Fields */
 .field{display:grid;gap:2px}
 .field label{font:400 .76rem var(--mono);color:var(--grey)}
-.field input{width:100%;font:inherit;font-size:1rem;color:var(--fg);background:transparent;border:0;border-bottom:var(--stroke) solid var(--fg);border-radius:0;padding:.35em 0}
+.field input,.len input{width:100%;font:inherit;font-size:1rem;color:var(--fg);background:transparent;border:0;border-bottom:var(--stroke) solid var(--fg);border-radius:0;padding:.35em 0}
 
 /* Schema */
 .branch + .branch{margin-top:20px;padding-top:16px;border-top:1px solid var(--hair)}
@@ -72,6 +72,9 @@ h1{font:500 clamp(1.7rem,2.3vw,2.4rem)/1 var(--sans);letter-spacing:.01em;text-t
 .chip{font:400 .9rem/1.2 var(--sans);padding:.4em .65em;border:var(--stroke) solid var(--fg);background:var(--bg);color:var(--fg);cursor:pointer;border-radius:0}
 .chip:hover{background:var(--soft)}
 .chip[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+.len{display:flex;align-items:baseline;gap:8px;margin-top:10px;font-size:.9rem}
+.len input{width:7em}
+.len span{color:var(--grey)}
 .modebar{display:grid;gap:12px;margin:-16px -16px 18px;padding:14px 16px;border-bottom:var(--stroke) solid var(--fg);background:var(--soft)}
 .tabs{display:flex;flex-wrap:wrap;gap:6px}
 .tab{font:400 .8rem var(--mono);padding:.35em .6em;border:var(--stroke) solid var(--fg);background:var(--bg);color:var(--fg);cursor:pointer;border-radius:0}
@@ -116,7 +119,7 @@ h1{font:500 clamp(1.7rem,2.3vw,2.4rem)/1 var(--sans);letter-spacing:.01em;text-t
     </div>
 
     <section aria-label="How it works">
-      <div class="how-head"><p class="label">how it works</p><p class="label">v<span id="version">0.1</span></p></div>
+      <div class="how-head"><p class="label">how it works</p><p class="label">v<span id="version">0.2</span></p></div>
       <dl class="how-list">
         <dt>Schema</dt><dd>Each tool is described by its input, its output and other features. A tool with several functions gets one mode per function.</dd>
         <dt>Browse</dt><dd>Click properties in the schema to filter the tools.</dd>
@@ -183,23 +186,31 @@ h1{font:500 clamp(1.7rem,2.3vw,2.4rem)/1 var(--sans);letter-spacing:.01em;text-t
   // On GitHub Pages (account.github.io/repo-name) the repository is detected automatically.
   const REPO_OVERRIDE = "";
 
+  // Everything below is driven by data/schema.json. Supported kinds: multi, single, bool, length.
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
   const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const MAX_LENGTH = 100000;
 
   let SCHEMA = null, TOOLS = [], DIMS = [];
   let mode = "browse";
   const filters = {};
   let query = "";
-  const emptyMode = () => ({ name: "", input_type: [], chronological: null, output_type: [], interaction: null, realtime: null });
-  const emptyDraft = () => ({ name: "", modes: [emptyMode()] });
-  let draft = emptyDraft();
+  let draft = null;
   let active = 0;
 
   const val = id => (SCHEMA.values[id] || { label: id, def: "" });
   const dim = id => DIMS.find(d => d.id === id);
+  const short = d => d.short || d.label;
   const STATUS = { example: "example", submitted: "submitted" };
   const DEF_DEFAULT = "Point at a property to see what it means.";
+
+  const emptyMode = () => {
+    const m = { name: "" };
+    DIMS.forEach(d => (m[d.id] = d.kind === "multi" ? [] : null));
+    return m;
+  };
+  const emptyDraft = () => ({ name: "", modes: [emptyMode()] });
 
   async function fetchJson(path) {
     let res;
@@ -221,11 +232,27 @@ h1{font:500 clamp(1.7rem,2.3vw,2.4rem)/1 var(--sans);letter-spacing:.01em;text-t
       return;
     }
     DIMS = SCHEMA.branches.flatMap(b => b.dimensions.map(d => ({ ...d, branch: b.id })));
+    draft = emptyDraft();
     $("#version").textContent = SCHEMA.version;
     renderSchema();
     bind();
     updateUI();
   }
+
+  /* ---------- Values ---------- */
+  function fmtText(d, v) {
+    if (d.kind === "multi") return v && v.length ? v.map(x => val(x).label).join(", ") : null;
+    if (d.kind === "bool") return v === true ? "Yes" : v === false ? "No" : null;
+    if (d.kind === "single") return v ? val(v).label : null;
+    if (d.kind === "length") {
+      if (!v || !v.unit) return null;
+      if (!val(v.unit).numeric) return val(v.unit).label;
+      return v.value > 0 ? `${v.value} ${val(v.unit).label.toLowerCase()}` : null;
+    }
+    return null;
+  }
+  const missing = () => `<span class="missing">—</span>`;
+  const fmt = (d, v) => { const t = fmtText(d, v); return t === null ? missing() : esc(t); };
 
   /* ---------- Schema chips ---------- */
   function options(d) {
@@ -240,13 +267,21 @@ h1{font:500 clamp(1.7rem,2.3vw,2.4rem)/1 var(--sans);letter-spacing:.01em;text-t
             <p class="dim-label">${esc(d.label)}</p>
             <div class="chips">${options(d).map(([v, l]) =>
               `<button type="button" class="chip" data-dim="${d.id}" data-val="${esc(v)}" aria-pressed="false">${esc(l)}</button>`).join("")}</div>
+            ${d.kind === "length" ? `
+              <div class="len" data-len="${d.id}" hidden>
+                <span>max.</span>
+                <input type="number" min="1" max="${MAX_LENGTH}" step="any" inputmode="decimal" data-len-input="${d.id}" aria-label="${esc(d.label)} value">
+                <span data-len-unit="${d.id}"></span>
+              </div>` : ""}
           </div>`).join("")}
       </div>`).join("");
   }
   function isOn(m, d, v) {
-    if (d.kind === "multi") return (m[d.id] || []).includes(v);
-    if (d.kind === "bool") return m[d.id] === (v === "true");
-    return m[d.id] === v;
+    const x = m[d.id];
+    if (d.kind === "multi") return (x || []).includes(v);
+    if (d.kind === "bool") return x === (v === "true");
+    if (d.kind === "length") return !!x && x.unit === v;
+    return x === v;
   }
   function filterOn(d, v) {
     const f = filters[d.id];
@@ -254,13 +289,27 @@ h1{font:500 clamp(1.7rem,2.3vw,2.4rem)/1 var(--sans);letter-spacing:.01em;text-t
     return !!(f && f.has(v));
   }
   const chipOn = (d, v) => (mode === "browse" ? filterOn(d, v) : isOn(draft.modes[active], d, v));
+  function refreshLength(d) {
+    const box = $(`[data-len="${d.id}"]`);
+    const x = mode === "classify" ? draft.modes[active][d.id] : null;
+    const show = !!(x && val(x.unit).numeric);
+    box.hidden = !show;
+    if (show) {
+      $(`[data-len-input="${d.id}"]`).value = x.value ?? "";
+      $(`[data-len-unit="${d.id}"]`).textContent = val(x.unit).label.toLowerCase();
+    }
+  }
   function refreshChips(dimId) {
     $$(dimId ? `.chip[data-dim="${dimId}"]` : ".chip", $("#schema-content"))
       .forEach(c => c.setAttribute("aria-pressed", String(chipOn(dim(c.dataset.dim), c.dataset.val))));
+    DIMS.filter(d => d.kind === "length" && (!dimId || dimId === d.id)).forEach(refreshLength);
   }
   function showDef(chip) {
-    const d = dim(chip.dataset.dim);
-    const [label, text] = d.kind === "bool" ? [d.label, d.def] : [val(chip.dataset.val).label, val(chip.dataset.val).def];
+    const d = dim(chip.dataset.dim), v = chip.dataset.val;
+    let label, text;
+    if (d.kind === "bool") [label, text] = [d.label, d.def];
+    else if (d.kind === "length") [label, text] = [`${d.label} · ${val(v).label}`, `${d.def} ${val(v).def}`];
+    else [label, text] = [val(v).label, val(v).def];
     $("#def").innerHTML = `<b>${esc(label)}</b> ${esc(text)}`;
   }
 
@@ -270,28 +319,20 @@ h1{font:500 clamp(1.7rem,2.3vw,2.4rem)/1 var(--sans);letter-spacing:.01em;text-t
   }
   function modeMatches(m, act) {
     return act.every(d => {
-      const f = filters[d.id];
-      if (d.kind === "bool") return m[d.id] === f;
-      if (d.kind === "multi") return (m[d.id] || []).some(v => f.has(v));
-      return f.has(m[d.id]);
+      const f = filters[d.id], x = m[d.id];
+      if (d.kind === "bool") return x === f;
+      if (d.kind === "multi") return (x || []).some(v => f.has(v));
+      if (d.kind === "length") return !!x && f.has(x.unit);
+      return f.has(x);
     });
   }
-  const missing = () => `<span class="missing">—</span>`;
-  const list = arr => (arr && arr.length ? esc(arr.map(v => val(v).label).join(", ")) : missing());
-  const yn = b => (b === true ? "Yes" : b === false ? "No" : missing());
   function safeUrl(u) {
     try { const x = new URL(u); return /^https?:$/.test(x.protocol) ? x : null; } catch { return null; }
   }
   function modeHtml(m, dimmed) {
     return `<div class="mode${dimmed ? " is-dim" : ""}">
       <p class="mode-name">${esc(m.name || "Unnamed mode")}</p>
-      <dl class="kv">
-        <dt>Input</dt><dd>${list(m.input_type)}</dd>
-        <dt>Chronological</dt><dd>${yn(m.chronological)}</dd>
-        <dt>Output</dt><dd>${list(m.output_type)}</dd>
-        <dt>Interaction</dt><dd>${m.interaction ? esc(val(m.interaction).label) : missing()}</dd>
-        <dt>Real-time</dt><dd>${yn(m.realtime)}</dd>
-      </dl>
+      <dl class="kv">${DIMS.map(d => `<dt>${esc(short(d))}</dt><dd>${fmt(d, m[d.id])}</dd>`).join("")}</dl>
     </div>`;
   }
   function toolHtml(t, matchFn) {
@@ -325,21 +366,22 @@ h1{font:500 clamp(1.7rem,2.3vw,2.4rem)/1 var(--sans);letter-spacing:.01em;text-t
   }
   const REPO = detectRepo();
 
-  const sortBySchema = (arr, d) => [...arr].sort((a, b) => d.values.indexOf(a) - d.values.indexOf(b));
   const slug = s => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
   function buildEntry() {
     return {
       id: slug(draft.name) || "unnamed",
       name: draft.name.trim(),
       status: "submitted",
-      modes: draft.modes.map((m, i) => ({
-        name: m.name.trim() || `Mode ${i + 1}`,
-        input_type: sortBySchema(m.input_type, dim("input_type")),
-        chronological: m.chronological,
-        output_type: sortBySchema(m.output_type, dim("output_type")),
-        interaction: m.interaction,
-        realtime: m.realtime
-      }))
+      modes: draft.modes.map((m, i) => {
+        const out = { name: m.name.trim() || `Mode ${i + 1}` };
+        DIMS.forEach(d => {
+          const x = m[d.id];
+          if (d.kind === "multi") out[d.id] = d.values.filter(v => x.includes(v));
+          else if (d.kind === "length") out[d.id] = !x ? null : val(x.unit).numeric ? { unit: x.unit, value: x.value } : { unit: x.unit };
+          else out[d.id] = x;
+        });
+        return out;
+      })
     };
   }
   function problems() {
@@ -347,25 +389,27 @@ h1{font:500 clamp(1.7rem,2.3vw,2.4rem)/1 var(--sans);letter-spacing:.01em;text-t
     if (!draft.name.trim()) out.push("tool name");
     draft.modes.forEach((m, i) => {
       const miss = [];
-      if (!m.input_type.length) miss.push("input type");
-      if (m.chronological === null) miss.push("chronological");
-      if (!m.output_type.length) miss.push("output type");
-      if (!m.interaction) miss.push("interaction");
-      if (m.realtime === null) miss.push("real-time");
+      DIMS.forEach(d => {
+        const x = m[d.id], s = short(d).toLowerCase();
+        if (d.kind === "multi" && !x.length) miss.push(s);
+        else if ((d.kind === "single" || d.kind === "bool") && x === null) miss.push(s);
+        else if (d.kind === "length") {
+          if (!x) miss.push(s);
+          else if (val(x.unit).numeric && !(x.value > 0 && x.value <= MAX_LENGTH)) miss.push(`${s} value`);
+        }
+      });
       if (miss.length) out.push(`${draft.modes.length > 1 ? `mode ${i + 1}: ` : ""}${miss.join(", ")}`);
     });
     return out;
   }
   function issueUrl(entry) {
-    const labels = arr => (arr.length ? arr.map(v => val(v).label).join(", ") : "–");
-    const y = b => (b === true ? "Yes" : b === false ? "No" : "–");
-    const rows = entry.modes.map(m => `| ${m.name} | ${labels(m.input_type)} | ${y(m.chronological)} | ${labels(m.output_type)} | ${m.interaction ? val(m.interaction).label : "–"} | ${y(m.realtime)} |`);
+    const cell = (d, v) => fmtText(d, v) ?? "–";
     const body = [
       `**Tool:** ${entry.name}`,
       "",
-      "| Mode | Input | Chronological | Output | Interaction | Real-time |",
-      "|---|---|---|---|---|---|",
-      ...rows,
+      `| Mode | ${DIMS.map(short).join(" | ")} |`,
+      `|${"---|".repeat(DIMS.length + 1)}`,
+      ...entry.modes.map(m => `| ${m.name} | ${DIMS.map(d => cell(d, m[d.id])).join(" | ")} |`),
       "",
       "**Record for `data/tools.json`**",
       "```json",
@@ -439,11 +483,22 @@ h1{font:500 clamp(1.7rem,2.3vw,2.4rem)/1 var(--sans);letter-spacing:.01em;text-t
         const m = draft.modes[active];
         if (d.kind === "multi") m[d.id] = m[d.id].includes(v) ? m[d.id].filter(x => x !== v) : [...m[d.id], v];
         else if (d.kind === "bool") { const b = v === "true"; m[d.id] = m[d.id] === b ? null : b; }
+        else if (d.kind === "length") m[d.id] = m[d.id] && m[d.id].unit === v ? null : { unit: v, value: null };
         else m[d.id] = m[d.id] === v ? null : v;
         refreshChips(d.id);
         updateEntry();
+        if (d.kind === "length" && m[d.id] && val(v).numeric) $(`[data-len-input="${d.id}"]`).focus();
       }
       showDef(c);
+    });
+    $("#schema-content").addEventListener("input", e => {
+      const id = e.target.dataset.lenInput;
+      if (!id || mode !== "classify") return;
+      const x = draft.modes[active][id];
+      if (!x) return;
+      const n = parseFloat(e.target.value);
+      x.value = Number.isFinite(n) && n > 0 ? n : null;
+      updateEntry();
     });
     $("#schema-content").addEventListener("mouseover", e => { const c = e.target.closest(".chip"); if (c) showDef(c); });
     $("#schema-content").addEventListener("focusin", e => { const c = e.target.closest(".chip"); if (c) showDef(c); });
