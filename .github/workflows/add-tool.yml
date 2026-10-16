@@ -64,11 +64,25 @@ jobs:
               const mode = { name: text(m && m.name, 60) || `Mode ${i + 1}` };
               for (const d of dims) {
                 const v = m ? m[d.id] : undefined;
-                const ok = d.kind === "multi" ? Array.isArray(v) && v.length > 0 && v.every(x => d.values.includes(x))
-                  : d.kind === "single" ? d.values.includes(v)
-                  : typeof v === "boolean";
-                if (!ok) return fail(`Mode ${i + 1} has an invalid value for "${d.label}".`);
-                mode[d.id] = d.kind === "multi" ? d.values.filter(x => v.includes(x)) : v;
+                const bad = () => fail(`Mode ${i + 1} has an invalid value for "${d.label}".`);
+                if (d.kind === "multi") {
+                  if (!(Array.isArray(v) && v.length > 0 && v.every(x => d.values.includes(x)))) return bad();
+                  mode[d.id] = d.values.filter(x => v.includes(x));
+                } else if (d.kind === "single") {
+                  if (!d.values.includes(v)) return bad();
+                  mode[d.id] = v;
+                } else if (d.kind === "bool") {
+                  if (typeof v !== "boolean") return bad();
+                  mode[d.id] = v;
+                } else if (d.kind === "length") {
+                  const unit = v && v.unit;
+                  if (!d.values.includes(unit)) return bad();
+                  const numeric = !!(schema.values[unit] && schema.values[unit].numeric);
+                  if (numeric && !(typeof v.value === "number" && v.value > 0 && v.value <= 100000)) return bad();
+                  mode[d.id] = numeric ? { unit, value: v.value } : { unit };
+                } else {
+                  return fail(`Unknown schema kind "${d.kind}".`);
+                }
               }
               modes.push(mode);
             }
