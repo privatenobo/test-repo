@@ -60,5 +60,23 @@
         "realtime": true
       }
     ]
-  }
+  },{
+  "id": "test-tool",
+  "name": "Test Tool",
+  "status": "submitted",
+  "modes": [
+    {
+      "name": "automatische erkennung",
+      "input_type": [
+        "text_prompt"
+      ],
+      "chronological": false,
+      "output_type": [
+        "lyrics"
+      ],
+      "interaction": "accompanies",
+      "realtime": false
+    }
+  ]
+}
 ]
