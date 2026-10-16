@@ -7,17 +7,28 @@
     "modes": [
       {
         "name": "Create song",
-        "input_type": ["text_prompt", "tags_features", "lyrics"],
+        "input_type": [
+          "text_prompt",
+          "tags_features",
+          "lyrics"
+        ],
         "chronological": false,
-        "output_type": ["audio"],
+        "output_type": [
+          "audio"
+        ],
         "interaction": "no_direct_connection",
         "realtime": false
       },
       {
         "name": "Cover",
-        "input_type": ["tags_features", "audio"],
+        "input_type": [
+          "tags_features",
+          "audio"
+        ],
         "chronological": true,
-        "output_type": ["audio"],
+        "output_type": [
+          "audio"
+        ],
         "interaction": "altered_version",
         "realtime": false
       }
@@ -31,9 +42,15 @@
     "modes": [
       {
         "name": "Create song",
-        "input_type": ["text_prompt", "tags_features", "lyrics"],
+        "input_type": [
+          "text_prompt",
+          "tags_features",
+          "lyrics"
+        ],
         "chronological": false,
-        "output_type": ["audio"],
+        "output_type": [
+          "audio"
+        ],
         "interaction": "no_direct_connection",
         "realtime": false
       }
@@ -47,11 +64,34 @@
     "modes": [
       {
         "name": "Duet",
-        "input_type": ["performance_midi"],
+        "input_type": [
+          "performance_midi"
+        ],
         "chronological": true,
-        "output_type": ["performance_midi"],
+        "output_type": [
+          "performance_midi"
+        ],
         "interaction": "accompanies",
         "realtime": true
+      }
+    ]
+  },
+  {
+    "id": "test-tool",
+    "name": "Test Tool",
+    "status": "reviewed",
+    "modes": [
+      {
+        "name": "automatische erkennung",
+        "input_type": [
+          "text_prompt"
+        ],
+        "chronological": false,
+        "output_type": [
+          "lyrics"
+        ],
+        "interaction": "accompanies",
+        "realtime": false
       }
     ]
   }
