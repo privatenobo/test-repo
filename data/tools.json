@@ -3,7 +3,7 @@
     "id": "suno",
     "name": "Suno",
     "url": "https://suno.com",
-    "status": "example",
+    "status": "approved",
     "modes": [
       {
         "name": "Create song",
@@ -43,7 +43,7 @@
     "id": "udio",
     "name": "Udio",
     "url": "https://www.udio.com",
-    "status": "example",
+    "status": "approved",
     "modes": [
       {
         "name": "Create song",
@@ -66,7 +66,7 @@
     "id": "ai-duet",
     "name": "A.I. Duet",
     "url": "https://experiments.withgoogle.com/ai-duet",
-    "status": "example",
+    "status": "approved",
     "modes": [
       {
         "name": "Duet",
