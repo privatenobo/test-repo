@@ -104,5 +104,28 @@
         "realtime": false
       }
     ]
+  },
+  {
+    "id": "beatmakker",
+    "name": "Beatmakker",
+    "status": "reviewed",
+    "modes": [
+      {
+        "name": "Create beat",
+        "input_type": [
+          "text_prompt"
+        ],
+        "chronological": true,
+        "output_type": [
+          "performance_midi",
+          "audio"
+        ],
+        "interaction": "accompanies",
+        "length": {
+          "unit": "unlimited"
+        },
+        "realtime": true
+      }
+    ]
   }
 ]
