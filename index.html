@@ -1,0 +1,726 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Musik-KI-Schema</title>
+<meta name="description" content="Ein offenes Schema, um generative Musik-KI nach Input, Output und Echtzeitfähigkeit einzuordnen.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@1,6..72,400;1,6..72,500&family=Spline+Sans+Mono:wght@300;400;500&family=Spline+Sans:wght@400;500;600&display=swap">
+<style>
+/* Poster-Logik: jede Sektion ein Plakat, Pills als Beschriftung und Bedienelement */
+:root{
+  --sand:#D7D2C3; --ground:#E7E3D9; --paper:#F4F2EC; --ink:#151515; --ink-2:#55524A;
+  --line:rgba(21,21,21,.16); --muted-dark:#A9A497;
+  --koralle:#EB5A46; --blau:#4664AA; --rosa:#F0C8E1;
+  --koralle-t:#F7D6CF; --blau-t:#D8DEEE; --rosa-t:#F8E7F1;
+  --danger:#A3261B; --danger-dark:#F4A79A;
+  --display:"Spline Sans Mono",ui-monospace,Menlo,Consolas,monospace;
+  --body:"Spline Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --serif:"Newsreader",Georgia,"Times New Roman",serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--ground);color:var(--ink);font:400 16px/1.55 var(--body)}
+a{color:inherit}
+h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:-.02em;text-wrap:balance;margin:0}
+code{font-family:var(--display);font-size:.86em;background:rgba(21,21,21,.07);padding:.1em .35em;border-radius:4px}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left));padding-right:max(20px,env(safe-area-inset-right))}
+:focus-visible{outline:2px solid var(--blau);outline-offset:2px}
+
+/* Pills */
+.pill{--pb:var(--sand);--pf:var(--ink);display:inline-flex;align-items:center;gap:.45em;font:italic 400 1rem/1.1 var(--serif);padding:.36em .9em .42em .36em;border:0;border-radius:999px;color:var(--pf);background:var(--pb) linear-gradient(180deg,rgba(255,255,255,.45),rgba(255,255,255,0) 55%,rgba(0,0,0,.06));box-shadow:inset 0 1px 0 rgba(255,255,255,.6),inset 0 -2px 3px rgba(0,0,0,.16),0 1px 2px rgba(0,0,0,.22);white-space:nowrap}
+.pill .sign{display:inline-grid;place-items:center;flex:none;width:1.2em;height:1.2em;border-radius:50%;border:1px solid currentColor;font:normal 400 .72em/1 var(--display);opacity:.75}
+.pill-koralle{--pb:var(--koralle)} .pill-blau{--pb:var(--blau);--pf:var(--paper)} .pill-rosa{--pb:var(--rosa)}
+.pill-lg{font-size:1.35rem}
+button.pill{cursor:pointer;font-size:.95rem}
+button.pill:hover{filter:brightness(1.04)}
+.toggle[aria-pressed="false"]{--pb:var(--paper)}
+.toggle[aria-pressed="true"]{box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 3px rgba(0,0,0,.18),0 0 0 1.5px var(--ink)}
+.toggle[aria-pressed="true"][data-branch="input"]{--pb:var(--koralle)}
+.toggle[aria-pressed="true"][data-branch="output"]{--pb:var(--blau);--pf:var(--paper)}
+.toggle[aria-pressed="true"][data-branch="other"]{--pb:var(--rosa)}
+.pills{display:flex;flex-wrap:wrap;gap:6px}
+.link-button{background:none;border:0;padding:0;font:500 .85rem var(--display);text-decoration:underline;cursor:pointer;color:inherit}
+
+/* Hero */
+.hero{background:var(--ink);color:var(--sand)}
+.hero .wrap{padding-block:20px 36px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:.6rem;text-decoration:none;font:400 1.05rem var(--display)}
+.nav{display:flex;flex-wrap:wrap;gap:.4rem 1.25rem;list-style:none;margin:0;padding:0;font:400 .9rem var(--display)}
+.nav a{text-decoration:none;opacity:.8}
+.nav a:hover{opacity:1;text-decoration:underline}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:40px;align-items:end;margin-top:72px}
+.hero-title{font-size:clamp(2rem,4.6vw,3.9rem);line-height:1.05;font-weight:300}
+.hero-lede{max-width:44ch;margin:0 0 20px;color:var(--muted-dark)}
+.hero-pills{display:flex;flex-wrap:wrap;gap:8px}
+.badge-line{margin:44px 0 0;font:400 .8rem var(--display);color:var(--muted-dark)}
+.tag{display:inline-block;border:1px solid currentColor;border-radius:999px;padding:.1em .6em;margin-right:.5em}
+
+/* Sektionen */
+.section{padding-block:64px}
+.section-alt{background:var(--sand)}
+.section-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px 32px;flex-wrap:wrap;border-top:1px solid var(--ink);padding-top:14px;margin-bottom:32px}
+.section-head h2{font-size:clamp(1.8rem,3vw,2.6rem);font-weight:300}
+.section-head p{margin:0;max-width:56ch;color:var(--ink-2)}
+.fineprint{font-size:.85rem;color:var(--ink-2);margin:18px 0 0}
+.notice{grid-column:1/-1;background:var(--paper);border-radius:18px;padding:24px;margin:0}
+
+/* Schema-Baum */
+.tree-root{display:flex;justify-content:center;padding-bottom:24px;position:relative}
+.tree-root::after{content:"";position:absolute;left:50%;bottom:0;width:1px;height:24px;background:var(--ink)}
+.tree-branches{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;padding-top:24px;position:relative}
+.tree-branches::before{content:"";position:absolute;top:0;left:calc((100% - 40px)/6);right:calc((100% - 40px)/6);height:1px;background:var(--ink)}
+.branch{position:relative;border-radius:22px;padding:24px 22px 26px;display:flex;flex-direction:column;gap:22px;min-width:0}
+.branch::before{content:"";position:absolute;top:-24px;left:50%;width:1px;height:24px;background:var(--ink)}
+.branch-input{background:var(--koralle);color:var(--ink)}
+.branch-output{background:var(--blau);color:var(--paper)}
+.branch-other{background:var(--rosa);color:var(--ink)}
+.branch-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.branch h3{font-size:clamp(1.7rem,2.5vw,2.3rem);font-weight:300;line-height:1}
+.en{font:400 .74rem var(--display);opacity:.7}
+.dim-label{display:flex;justify-content:space-between;gap:8px;align-items:baseline;font:500 .78rem var(--display);letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid currentColor;padding-bottom:6px;margin:0 0 12px}
+.dim-label .en{text-transform:none;letter-spacing:0;font-weight:400}
+.value-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px}
+.value-list li{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px}
+.value-def{flex-basis:100%;margin:0;font-size:.88rem;line-height:1.45}
+.yn{display:flex;gap:8px;margin-top:10px}
+
+/* Filter */
+.filters{background:var(--paper);border-radius:18px;padding:20px;display:grid;gap:18px;margin-bottom:24px}
+.filter-search{display:grid;gap:6px;max-width:420px}
+.filter-groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:16px 28px}
+.filter-group{display:grid;gap:8px;align-content:start}
+.glabel,.field label,.label{display:flex;align-items:center;gap:.5em;font:500 .76rem var(--display);letter-spacing:.05em;text-transform:uppercase;margin:0}
+.dot{width:.75em;height:.75em;border-radius:50%;flex:none}
+.dot-input{background:var(--koralle)} .dot-output{background:var(--blau)} .dot-other{background:var(--rosa);box-shadow:inset 0 0 0 1px rgba(0,0,0,.2)}
+.filter-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+
+/* Katalog */
+.catalog{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,460px),1fr));gap:20px;align-items:start}
+.tool{background:var(--paper);border-radius:18px;padding:22px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.tool-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.tool h3{font-size:1.5rem}
+.tool-provider{font:400 .8rem var(--display);color:var(--ink-2);margin:4px 0 0}
+.status{font:500 .68rem var(--display);text-transform:uppercase;letter-spacing:.06em;border:1px solid var(--line);border-radius:999px;padding:.3em .7em;white-space:nowrap;color:var(--ink-2)}
+.tool-desc{margin:0;font-size:.95rem}
+.tool-link{font:400 .8rem var(--display);align-self:flex-start;overflow-wrap:anywhere}
+.modes{display:flex;flex-direction:column;gap:12px}
+.mode{border-top:1px solid var(--line);padding-top:12px;display:grid;gap:8px;transition:opacity .2s}
+.mode.is-dim{opacity:.32}
+.mode-name{font:italic 500 1.12rem var(--serif);margin:0}
+.mode-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.cell{border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.cell-input{background:var(--koralle-t)} .cell-output{background:var(--blau-t)} .cell-other{background:var(--rosa-t)}
+.cell-label{font:500 .64rem var(--display);text-transform:uppercase;letter-spacing:.07em;color:var(--ink-2)}
+.chips{display:flex;flex-wrap:wrap;gap:4px}
+.chip{font-size:.78rem;line-height:1.25;padding:.2em .6em;border-radius:999px}
+.chip-input{background:var(--koralle);color:var(--ink)}
+.chip-output{background:var(--blau);color:var(--paper)}
+.chip-empty{background:var(--paper);color:var(--ink-2)}
+.kv{font-size:.78rem;color:var(--ink-2)}
+.kv b{font-weight:600;color:var(--ink)}
+.mode-note{font-size:.84rem;color:var(--ink-2);margin:0}
+.mode-note b{font:500 .7rem var(--display);text-transform:uppercase;letter-spacing:.06em;color:var(--ink)}
+
+/* Einordnen */
+.classify{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:28px;align-items:start}
+.classify-form{display:flex;flex-direction:column;gap:18px;min-width:0}
+.block{border:0;margin:0;background:var(--paper);border-radius:18px;padding:20px;display:grid;gap:14px;min-width:0}
+.block legend{float:left;width:100%;padding:0;display:flex;justify-content:space-between;align-items:baseline;gap:12px;font:400 1.2rem var(--display)}
+.field{display:grid;gap:6px;min-width:0}
+.req{font-weight:400;text-transform:none;letter-spacing:0;color:var(--ink-2)}
+.field-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+input[type=text],input[type=url],input[type=search],textarea{width:100%;font:inherit;color:var(--ink);background:var(--ground);border:1px solid var(--line);border-radius:10px;padding:.6em .75em}
+textarea{resize:vertical}
+.mode-branch{border-radius:12px;padding:12px 14px;display:grid;gap:12px}
+.mb-input{background:var(--koralle-t)} .mb-output{background:var(--blau-t)} .mb-other{background:var(--rosa-t)}
+.mode-dim{display:grid;gap:7px}
+.label .hint-inline{font-weight:400;text-transform:none;letter-spacing:0;color:var(--ink-2)}
+.error{color:var(--danger);font-size:.86rem;margin:0}
+.form-actions-inline{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px}
+.preview{position:sticky;top:16px;display:grid;gap:14px;min-width:0}
+.submit-box{background:var(--ink);color:var(--sand);border-radius:18px;padding:20px;display:grid;gap:12px}
+.btn-primary{display:block;text-align:center;background:var(--koralle);color:var(--ink);font:500 1rem var(--display);padding:.85em 1em;border-radius:999px;text-decoration:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 -2px 3px rgba(0,0,0,.18)}
+.btn-primary[aria-disabled="true"]{opacity:.6}
+.btn-secondary{background:transparent;color:var(--sand);border:1px solid rgba(215,210,195,.5);border-radius:999px;padding:.7em 1em;font:400 .95rem var(--display);cursor:pointer}
+.submit-box .error{color:var(--danger-dark)}
+.hint{font-size:.84rem;color:var(--muted-dark);margin:0}
+.json-details summary{cursor:pointer;font:400 .85rem var(--display)}
+.json-details pre{margin:10px 0 0;max-height:300px;overflow:auto;font:400 .76rem/1.5 var(--display);background:#000;color:var(--sand);padding:12px;border-radius:10px}
+
+/* Mitmachen */
+.steps{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:24px}
+.step-list{list-style:none;counter-reset:s;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.step-list li{counter-increment:s;background:var(--paper);border-radius:18px;padding:18px}
+.step-list li::before{content:counter(s);display:grid;place-items:center;width:2em;height:2em;border-radius:50%;background:var(--ink);color:var(--sand);font:400 .9rem var(--display);margin-bottom:12px}
+.step-list h3{font-size:1.15rem;margin-bottom:6px}
+.step-list p{margin:0;font-size:.92rem}
+.open-questions{background:var(--ink);color:var(--sand);border-radius:18px;padding:20px}
+.open-questions h3{font-size:1.15rem;margin-bottom:12px}
+.open-questions ul{margin:0;padding-left:1.1em;display:grid;gap:10px;font-size:.92rem}
+.footer{background:var(--ink);color:var(--muted-dark);font:400 .8rem var(--display)}
+.footer .wrap{padding-block:28px;display:flex;justify-content:space-between;gap:8px 24px;flex-wrap:wrap}
+.footer p{margin:0}
+
+@media (max-width:920px){
+  .classify,.steps{grid-template-columns:1fr}
+  .preview{position:static}
+}
+@media (max-width:820px){
+  .hero-grid{grid-template-columns:1fr;gap:24px;margin-top:40px}
+  .tree-branches{grid-template-columns:1fr}
+  .tree-branches::before,.branch::before,.tree-root::after{display:none}
+  .tree-root{padding-bottom:16px}
+  .tree-branches{padding-top:0}
+}
+@media (max-width:640px){
+  .step-list,.field-row,.mode-grid{grid-template-columns:1fr}
+  .section{padding-block:44px}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.mode{transition:none}}
+</style>
+</head>
+<body>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <nav class="topbar" aria-label="Hauptnavigation">
+      <a class="brand" href="#top">
+        <span class="pill"><span class="sign" aria-hidden="true">+</span>Musik</span>
+        <span>KI-Schema</span>
+      </a>
+      <ul class="nav">
+        <li><a href="#schema">Schema</a></li>
+        <li><a href="#katalog">Katalog</a></li>
+        <li><a href="#einordnen">Einordnen</a></li>
+        <li><a href="#mitmachen">Mitmachen</a></li>
+      </ul>
+    </nav>
+    <div class="hero-grid">
+      <h1 class="hero-title">Was nimmt eine Musik-KI auf, was gibt sie aus, und wie hängt beides zusammen?</h1>
+      <div>
+        <p class="hero-lede">Ein offenes Schema, um generative Musik-Anwendungen vergleichbar zu machen. Jede Anwendung wird nach Input, Output und Echtzeitfähigkeit eingeordnet. Neue Einträge kann jede und jeder vorschlagen.</p>
+        <div class="hero-pills">
+          <span class="pill pill-koralle"><span class="sign" aria-hidden="true">+</span>Input</span>
+          <span class="pill pill-blau"><span class="sign" aria-hidden="true">+</span>Output</span>
+          <span class="pill pill-rosa"><span class="sign" aria-hidden="true">+</span>Weitere Merkmale</span>
+          <span class="pill" id="hero-count"><span class="sign" aria-hidden="true">+</span>Katalog</span>
+        </div>
+      </div>
+    </div>
+    <p class="badge-line"><span class="tag">Testversion</span>Schema v<span class="js-version">0.1</span> · Definitionen und Beispieleinträge sind Entwürfe</p>
+  </div>
+</header>
+
+<main>
+  <section id="schema" class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Das Schema</h2>
+        <p>Drei Äste, fünf Merkmale. Die englischen Originalbegriffe stehen klein daneben.</p>
+      </div>
+      <div class="tree">
+        <div class="tree-root"><span class="pill pill-lg"><span class="sign" aria-hidden="true">+</span>Gen AI Schema</span></div>
+        <div class="tree-branches" id="schema-branches"><p class="notice">Schema wird geladen …</p></div>
+      </div>
+      <p class="fineprint" id="schema-status"></p>
+    </div>
+  </section>
+
+  <section id="katalog" class="section section-alt">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Katalog</h2>
+        <p id="catalog-count" aria-live="polite">Einträge werden geladen …</p>
+      </div>
+      <div class="filters">
+        <div class="filter-search">
+          <label class="label" for="search">Suche</label>
+          <input id="search" type="search" placeholder="Name, Anbieter oder Funktion" autocomplete="off">
+        </div>
+        <div class="filter-groups" id="filter-groups"></div>
+        <div class="filter-foot">
+          <p class="fineprint" style="margin:0">Innerhalb eines Merkmals reicht ein Treffer, zwischen Merkmalen müssen alle passen.</p>
+          <button type="button" class="link-button" id="reset-filters" hidden>Filter zurücksetzen</button>
+        </div>
+      </div>
+      <div class="catalog" id="catalog"></div>
+    </div>
+  </section>
+
+  <section id="einordnen" class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Anwendung einordnen</h2>
+        <p>Wähle für jede Funktion der Anwendung die passenden Merkmale. Daneben siehst du, wie der Eintrag im Katalog erscheint.</p>
+      </div>
+      <div class="classify">
+        <form id="classify-form" class="classify-form" novalidate>
+          <fieldset class="block">
+            <legend>Anwendung</legend>
+            <div class="field">
+              <label for="f-name">Name <span class="req">Pflichtfeld</span></label>
+              <input id="f-name" data-field="name" type="text" autocomplete="off" placeholder="z. B. Mein Begleit-Tool">
+              <p class="error" id="err-name" hidden></p>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label for="f-anbieter">Anbieter</label>
+                <input id="f-anbieter" data-field="anbieter" type="text" autocomplete="off" placeholder="Firma, Lab oder Projekt">
+              </div>
+              <div class="field">
+                <label for="f-url">Website</label>
+                <input id="f-url" data-field="url" type="url" autocomplete="off" placeholder="https://">
+              </div>
+            </div>
+            <div class="field">
+              <label for="f-beschreibung">Kurzbeschreibung</label>
+              <textarea id="f-beschreibung" data-field="beschreibung" rows="2" placeholder="Was macht die Anwendung, in einem Satz?"></textarea>
+            </div>
+          </fieldset>
+          <div id="modes" class="classify-form"></div>
+          <div class="form-actions-inline">
+            <button type="button" class="pill" id="add-mode"><span class="sign" aria-hidden="true">+</span>Weiteren Modus hinzufügen</button>
+            <button type="button" class="link-button" id="fill-example">Beispiel ausfüllen</button>
+            <button type="button" class="link-button" id="clear-form">Formular leeren</button>
+          </div>
+        </form>
+        <aside class="preview" aria-label="Vorschau">
+          <p class="label">Vorschau im Katalog</p>
+          <div id="preview"></div>
+          <div class="submit-box">
+            <a class="btn-primary" id="submit-github" href="#einordnen" target="_blank" rel="noopener">Auf GitHub einreichen</a>
+            <button type="button" class="btn-secondary" id="copy-json">Datensatz kopieren</button>
+            <p class="error" id="err-summary" role="alert" hidden></p>
+            <p class="hint" id="repo-hint"></p>
+            <details class="json-details" id="json-details">
+              <summary>Datensatz ansehen</summary>
+              <pre id="json-out" tabindex="0"></pre>
+            </details>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section id="mitmachen" class="section section-alt">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Mitmachen</h2>
+        <p>Neue Einträge laufen über GitHub. Dafür braucht es ein kostenloses GitHub-Konto.</p>
+      </div>
+      <div class="steps">
+        <ol class="step-list">
+          <li><h3>Einordnen</h3><p>Formular oben ausfüllen. Eine Anwendung mit mehreren Funktionen bekommt mehrere Modi.</p></li>
+          <li><h3>Einreichen</h3><p>Der Button öffnet ein vorausgefülltes Issue im Repository. Dort nur noch abschicken.</p></li>
+          <li><h3>Prüfung</h3><p>Das Team prüft die Einordnung und übernimmt den Datensatz in <code>data/tools.json</code>. Die Seite aktualisiert sich danach von selbst.</p></li>
+        </ol>
+        <div class="open-questions">
+          <h3>Noch offen im Schema</h3>
+          <ul id="open-questions"></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <p>Testversion · Schema v<span class="js-version">0.1</span> · Stand Oktober 2026</p>
+    <p>Die Beispieleinträge sind vorläufig eingeordnet und noch nicht geprüft.</p>
+  </div>
+</footer>
+
+<script>
+(() => {
+  // Nur nötig bei eigener Domain oder lokalem Test, z. B. "konto/repo-name".
+  // Auf GitHub Pages (konto.github.io/repo-name) wird das Repository automatisch erkannt.
+  const REPO_OVERRIDE = "";
+
+  const $ = (s, el = document) => el.querySelector(s);
+  const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
+  const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+  let SCHEMA = null, TOOLS = [], DIMS = [];
+  const filters = {};
+  let query = "";
+  let showErrors = false;
+
+  const val = id => (SCHEMA.values[id] || { label: id, label_en: id, def: "" });
+  const yn = b => (b === true ? "Ja" : b === false ? "Nein" : "offen");
+  const dim = id => DIMS.find(d => d.id === id);
+  const STATUS = { beispiel: "Beispiel, ungeprüft", eingereicht: "Eingereicht", geprueft: "Geprüft", vorschau: "Vorschau" };
+
+  async function fetchJson(path) {
+    let res;
+    try { res = await fetch(path, { cache: "no-cache" }); }
+    catch (e) { throw new Error(`${path} konnte nicht geladen werden.`); }
+    if (!res.ok) throw new Error(`${path} wurde nicht gefunden (Fehler ${res.status}).`);
+    const text = await res.text();
+    try { return JSON.parse(text); }
+    catch (e) { throw new Error(`${path} enthält einen Formatfehler: ${e.message}`); }
+  }
+
+  async function init() {
+    try {
+      [SCHEMA, TOOLS] = await Promise.all([fetchJson("data/schema.json"), fetchJson("data/tools.json")]);
+    } catch (err) {
+      const local = location.protocol === "file:"
+        ? " Die Seite wurde direkt als Datei geöffnet. Bitte über die GitHub-Pages-Adresse aufrufen."
+        : "";
+      const msg = `<p class="notice"><strong>Daten konnten nicht geladen werden.</strong> ${esc(err.message)}${local}</p>`;
+      $("#schema-branches").innerHTML = msg;
+      $("#catalog").innerHTML = msg;
+      $("#catalog-count").textContent = "Keine Daten";
+      return;
+    }
+    DIMS = SCHEMA.branches.flatMap(b => b.dimensions.map(d => ({ ...d, branch: b.id })));
+    $$(".js-version").forEach(el => (el.textContent = SCHEMA.version));
+    $("#schema-status").textContent = SCHEMA.status || "";
+    $("#open-questions").innerHTML = (SCHEMA.open_questions || []).map(q => `<li>${esc(q)}</li>`).join("");
+    $("#hero-count").lastChild.textContent = `${TOOLS.length} Anwendungen im Katalog`;
+    renderSchema();
+    renderFilters();
+    renderCatalog();
+    initForm();
+  }
+
+  /* ---------- Schema ---------- */
+  function renderSchema() {
+    $("#schema-branches").innerHTML = SCHEMA.branches.map(b => `
+      <article class="branch branch-${b.id}">
+        <div class="branch-head"><h3>${esc(b.label)}</h3><span class="en">${esc(b.label_en)}</span></div>
+        ${b.dimensions.map(d => `
+          <div>
+            <p class="dim-label"><span>${esc(d.label)}</span><span class="en">${esc(d.label_en)}</span></p>
+            ${d.kind === "bool"
+              ? `<p class="value-def">${esc(d.def)}</p>
+                 <div class="yn"><span class="pill"><span class="sign" aria-hidden="true">+</span>Ja</span><span class="pill"><span class="sign" aria-hidden="true">+</span>Nein</span></div>`
+              : `<ul class="value-list">${d.values.map(v => `
+                  <li><span class="pill"><span class="sign" aria-hidden="true">+</span>${esc(val(v).label)}</span>
+                  <span class="en">${esc(val(v).label_en)}</span>
+                  <p class="value-def">${esc(val(v).def)}</p></li>`).join("")}</ul>`}
+          </div>`).join("")}
+      </article>`).join("");
+  }
+
+  /* ---------- Gemeinsame Bausteine ---------- */
+  function options(d) {
+    return d.kind === "bool" ? [["true", "Ja"], ["false", "Nein"]] : d.values.map(v => [v, val(v).label]);
+  }
+  function toggleBtn(d, v, label, on, extra = "") {
+    return `<button type="button" class="pill toggle" data-dim="${d.id}" data-val="${esc(v)}" data-branch="${d.branch}" aria-pressed="${on}" ${extra}><span class="sign" aria-hidden="true">${on ? "–" : "+"}</span>${esc(label)}</button>`;
+  }
+  function setPressed(btn, on) {
+    btn.setAttribute("aria-pressed", String(on));
+    btn.querySelector(".sign").textContent = on ? "–" : "+";
+  }
+  function isOn(m, d, v) {
+    if (d.kind === "multi") return (m[d.id] || []).includes(v);
+    if (d.kind === "bool") return m[d.id] === (v === "true");
+    return m[d.id] === v;
+  }
+  function chips(arr, branch) {
+    return arr && arr.length
+      ? arr.map(v => `<span class="chip chip-${branch}">${esc(val(v).label)}</span>`).join("")
+      : `<span class="chip chip-empty">noch offen</span>`;
+  }
+  function safeUrl(u) {
+    try { const x = new URL(u); return /^https?:$/.test(x.protocol) ? x : null; } catch { return null; }
+  }
+  function modeHtml(m, dimmed) {
+    return `<div class="mode${dimmed ? " is-dim" : ""}">
+      <p class="mode-name">${esc(m.name || "Modus ohne Namen")}</p>
+      <div class="mode-grid">
+        <div class="cell cell-input"><span class="cell-label">Input</span><div class="chips">${chips(m.input_type, "input")}</div><span class="kv">Chronologisch: <b>${yn(m.chronological)}</b></span></div>
+        <div class="cell cell-output"><span class="cell-label">Output</span><div class="chips">${chips(m.output_type, "output")}</div><span class="kv">Bezug: <b>${m.interaction ? esc(val(m.interaction).label) : "offen"}</b></span></div>
+        <div class="cell cell-other"><span class="cell-label">Weitere Merkmale</span><span class="kv">Echtzeitfähig: <b>${yn(m.realtime)}</b></span></div>
+      </div>
+      ${m.notiz ? `<p class="mode-note"><b>Hinweis</b> ${esc(m.notiz)}</p>` : ""}
+    </div>`;
+  }
+  function toolCard(t, modeMatch) {
+    const u = safeUrl(t.url);
+    return `<article class="tool">
+      <div class="tool-head">
+        <div><h3>${esc(t.name || "Ohne Namen")}</h3>${t.anbieter ? `<p class="tool-provider">${esc(t.anbieter)}</p>` : ""}</div>
+        <span class="status">${esc(STATUS[t.status] || t.status || "")}</span>
+      </div>
+      ${t.beschreibung ? `<p class="tool-desc">${esc(t.beschreibung)}</p>` : ""}
+      ${u ? `<a class="tool-link" href="${esc(u.href)}" target="_blank" rel="noopener">${esc(u.hostname + u.pathname.replace(/\/$/, ""))} ↗</a>` : ""}
+      <div class="modes">${(t.modi || []).map(m => modeHtml(m, modeMatch ? !modeMatch(m) : false)).join("")}</div>
+    </article>`;
+  }
+
+  /* ---------- Katalog und Filter ---------- */
+  function renderFilters() {
+    $("#filter-groups").innerHTML = DIMS.map(d => {
+      const b = SCHEMA.branches.find(x => x.id === d.branch);
+      return `<div class="filter-group">
+        <p class="glabel"><span class="dot dot-${d.branch}"></span>${esc(b.label)}: ${esc(d.label)}</p>
+        <div class="pills">${options(d).map(([v, l]) => toggleBtn(d, v, l, false)).join("")}</div>
+      </div>`;
+    }).join("");
+    $("#filter-groups").addEventListener("click", e => {
+      const btn = e.target.closest(".toggle");
+      if (!btn) return;
+      const d = dim(btn.dataset.dim), v = btn.dataset.val;
+      if (d.kind === "bool") {
+        const b = v === "true";
+        filters[d.id] = filters[d.id] === b ? undefined : b;
+      } else {
+        const set = filters[d.id] || (filters[d.id] = new Set());
+        set.has(v) ? set.delete(v) : set.add(v);
+      }
+      $$(`.toggle[data-dim="${d.id}"]`, $("#filter-groups")).forEach(x => setPressed(x, filterOn(d, x.dataset.val)));
+      renderCatalog();
+    });
+    $("#search").addEventListener("input", e => { query = e.target.value.trim().toLowerCase(); renderCatalog(); });
+    $("#reset-filters").addEventListener("click", () => {
+      Object.keys(filters).forEach(k => delete filters[k]);
+      query = ""; $("#search").value = "";
+      $$(".toggle", $("#filter-groups")).forEach(x => setPressed(x, false));
+      renderCatalog();
+    });
+  }
+  function filterOn(d, v) {
+    const f = filters[d.id];
+    if (d.kind === "bool") return f === (v === "true");
+    return !!(f && f.has(v));
+  }
+  function activeFilters() {
+    return DIMS.filter(d => (d.kind === "bool" ? typeof filters[d.id] === "boolean" : filters[d.id] && filters[d.id].size));
+  }
+  function modeMatches(m, active) {
+    return active.every(d => {
+      const f = filters[d.id];
+      if (d.kind === "bool") return m[d.id] === f;
+      if (d.kind === "multi") return (m[d.id] || []).some(v => f.has(v));
+      return f.has(m[d.id]);
+    });
+  }
+  function renderCatalog() {
+    const active = activeFilters();
+    const searchOk = t => !query || [t.name, t.anbieter, t.beschreibung, ...(t.modi || []).map(m => m.name)].join(" ").toLowerCase().includes(query);
+    const matchFn = active.length ? m => modeMatches(m, active) : null;
+    const list = TOOLS.filter(t => searchOk(t) && (!matchFn || (t.modi || []).some(matchFn)));
+    const totalModes = TOOLS.reduce((n, t) => n + (t.modi || []).length, 0);
+    $("#catalog").innerHTML = list.length
+      ? list.map(t => toolCard(t, matchFn)).join("")
+      : `<p class="notice">Keine Anwendung passt zu dieser Auswahl. Entferne einzelne Filter oder setze alle zurück.</p>`;
+    $("#catalog-count").textContent = active.length || query
+      ? `${list.length} von ${TOOLS.length} Anwendungen passen. Nicht passende Modi sind abgeblendet.`
+      : `${TOOLS.length} Anwendungen mit ${totalModes} Modi`;
+    $("#reset-filters").hidden = !(active.length || query);
+  }
+
+  /* ---------- Einordnen ---------- */
+  const emptyMode = () => ({ name: "", input_type: [], chronological: null, output_type: [], interaction: null, realtime: null });
+  let draft = { name: "", anbieter: "", url: "", beschreibung: "", modi: [emptyMode()] };
+
+  function detectRepo() {
+    if (REPO_OVERRIDE) return REPO_OVERRIDE;
+    const m = location.hostname.match(/^([^.]+)\.github\.io$/i);
+    if (!m) return null;
+    const seg = location.pathname.split("/").filter(Boolean)[0];
+    return seg && !seg.includes(".") ? `${m[1]}/${seg}` : `${m[1]}/${location.hostname}`;
+  }
+  const REPO = detectRepo();
+
+  function renderModes() {
+    $("#modes").innerHTML = draft.modi.map((m, i) => `
+      <fieldset class="block" data-mode="${i}">
+        <legend><span>Modus ${i + 1}</span>${draft.modi.length > 1 ? `<button type="button" class="link-button" data-remove="${i}">Modus entfernen</button>` : ""}</legend>
+        <div class="field">
+          <label for="m${i}-name">Bezeichnung</label>
+          <input id="m${i}-name" type="text" data-mode="${i}" value="${esc(m.name)}" placeholder="z. B. Song erstellen, Cover, Live-Modus" autocomplete="off">
+        </div>
+        ${SCHEMA.branches.map(b => `
+          <div class="mode-branch mb-${b.id}">
+            ${b.dimensions.map(d0 => {
+              const d = dim(d0.id);
+              const hint = d.kind === "multi" ? "mehrere möglich" : d.kind === "single" ? "eine Auswahl" : "";
+              return `<div class="mode-dim">
+                <p class="label"><span class="dot dot-${b.id}"></span>${esc(b.label)}: ${esc(d.label)}${hint ? ` <span class="hint-inline">${hint}</span>` : ""}</p>
+                <div class="pills">${options(d).map(([v, l]) => toggleBtn(d, v, l, isOn(m, d, v), `data-mode="${i}"`)).join("")}</div>
+              </div>`;
+            }).join("")}
+          </div>`).join("")}
+        <p class="error" id="err-m${i}" hidden></p>
+      </fieldset>`).join("");
+  }
+
+  function sortBySchema(arr, d) {
+    return [...arr].sort((a, b) => d.values.indexOf(a) - d.values.indexOf(b));
+  }
+  function slug(s) {
+    return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/ß/g, "ss").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  }
+  function buildEntry() {
+    const e = { id: slug(draft.name) || "ohne-namen", name: draft.name.trim() };
+    ["anbieter", "url", "beschreibung"].forEach(k => { if (draft[k].trim()) e[k] = draft[k].trim(); });
+    e.status = "eingereicht";
+    e.modi = draft.modi.map(m => ({
+      name: m.name.trim() || "Modus ohne Namen",
+      input_type: sortBySchema(m.input_type, dim("input_type")),
+      chronological: m.chronological,
+      output_type: sortBySchema(m.output_type, dim("output_type")),
+      interaction: m.interaction,
+      realtime: m.realtime
+    }));
+    return e;
+  }
+  function issueUrl(entry) {
+    const labels = arr => (arr.length ? arr.map(v => val(v).label).join(", ") : "offen");
+    const rows = entry.modi.map(m => `| ${m.name} | ${labels(m.input_type)} | ${yn(m.chronological)} | ${labels(m.output_type)} | ${m.interaction ? val(m.interaction).label : "offen"} | ${yn(m.realtime)} |`);
+    const body = [
+      `**Anwendung:** ${entry.name}`,
+      entry.anbieter ? `**Anbieter:** ${entry.anbieter}` : "",
+      entry.url ? `**Website:** ${entry.url}` : "",
+      entry.beschreibung ? `**Beschreibung:** ${entry.beschreibung}` : "",
+      "",
+      "| Modus | Input | Chronologisch | Output | Bezug zum Input | Echtzeitfähig |",
+      "|---|---|---|---|---|---|",
+      ...rows,
+      "",
+      "**Datensatz für `data/tools.json`**",
+      "```json",
+      JSON.stringify(entry, null, 2),
+      "```",
+      "",
+      `_Eingereicht über das Formular auf der Seite (Schema v${SCHEMA.version})._`
+    ].filter((l, i, a) => l !== "" || a[i - 1] !== "").join("\n");
+    const params = new URLSearchParams({ title: `Neue Einordnung: ${entry.name}`, body });
+    return `https://github.com/${REPO}/issues/new?${params}`;
+  }
+
+  function update() {
+    const entry = buildEntry();
+    $("#preview").innerHTML = toolCard({ ...entry, name: entry.name || "Name der Anwendung", status: "vorschau" });
+    $("#json-out").textContent = JSON.stringify(entry, null, 2);
+    $("#submit-github").href = REPO ? issueUrl(entry) : "#einordnen";
+    if (showErrors) validate();
+  }
+
+  function validate() {
+    let ok = true, first = null;
+    const nameErr = $("#err-name");
+    if (!draft.name.trim()) {
+      nameErr.textContent = "Bitte gib den Namen der Anwendung an.";
+      nameErr.hidden = false; ok = false; first = first || $("#f-name");
+    } else nameErr.hidden = true;
+    draft.modi.forEach((m, i) => {
+      const missing = [];
+      if (!m.input_type.length) missing.push("Input-Typ");
+      if (m.chronological === null) missing.push("Chronologisch");
+      if (!m.output_type.length) missing.push("Output-Typ");
+      if (!m.interaction) missing.push("Bezug zum Input");
+      if (m.realtime === null) missing.push("Echtzeitfähig");
+      const el = $(`#err-m${i}`);
+      if (missing.length) {
+        el.textContent = `Es fehlt noch: ${missing.join(", ")}.`;
+        el.hidden = false; ok = false;
+        first = first || $(`fieldset[data-mode="${i}"] .toggle`);
+      } else el.hidden = true;
+    });
+    const sum = $("#err-summary");
+    sum.hidden = ok;
+    if (!ok) sum.textContent = "Bitte ergänze die rot markierten Angaben im Formular.";
+    return { ok, first };
+  }
+
+  function setForm() {
+    $("#f-name").value = draft.name;
+    $("#f-anbieter").value = draft.anbieter;
+    $("#f-url").value = draft.url;
+    $("#f-beschreibung").value = draft.beschreibung;
+    renderModes();
+    update();
+  }
+
+  function initForm() {
+    $("#classify-form").addEventListener("submit", e => e.preventDefault());
+    $$("[data-field]", $("#classify-form")).forEach(inp =>
+      inp.addEventListener("input", () => { draft[inp.dataset.field] = inp.value; update(); }));
+
+    $("#modes").addEventListener("input", e => {
+      const i = e.target.dataset.mode;
+      if (i === undefined || e.target.tagName !== "INPUT") return;
+      draft.modi[+i].name = e.target.value; update();
+    });
+    $("#modes").addEventListener("click", e => {
+      const rm = e.target.closest("[data-remove]");
+      if (rm) { draft.modi.splice(+rm.dataset.remove, 1); renderModes(); update(); return; }
+      const btn = e.target.closest(".toggle");
+      if (!btn) return;
+      const i = +btn.dataset.mode, m = draft.modi[i], d = dim(btn.dataset.dim), v = btn.dataset.val;
+      if (d.kind === "multi") {
+        m[d.id] = m[d.id].includes(v) ? m[d.id].filter(x => x !== v) : [...m[d.id], v];
+      } else if (d.kind === "bool") {
+        const b = v === "true"; m[d.id] = m[d.id] === b ? null : b;
+      } else {
+        m[d.id] = m[d.id] === v ? null : v;
+      }
+      $$(`.toggle[data-dim="${d.id}"]`, btn.closest("fieldset")).forEach(x => setPressed(x, isOn(m, d, x.dataset.val)));
+      update();
+    });
+    $("#add-mode").addEventListener("click", () => {
+      draft.modi.push(emptyMode()); renderModes(); update();
+      $(`#m${draft.modi.length - 1}-name`).focus();
+    });
+    $("#clear-form").addEventListener("click", () => {
+      draft = { name: "", anbieter: "", url: "", beschreibung: "", modi: [emptyMode()] };
+      showErrors = false;
+      $$(".error", $("#einordnen")).forEach(el => (el.hidden = true));
+      setForm();
+    });
+    $("#fill-example").addEventListener("click", () => {
+      draft = {
+        name: "Beispiel-Begleiter (Test)", anbieter: "Testeintrag", url: "", beschreibung: "Erzeugt eine Bassline zu einer eingespielten Akkordfolge.",
+        modi: [{ name: "Bassline zur Akkordfolge", input_type: ["performance_midi"], chronological: true, output_type: ["performance_midi"], interaction: "accompanies", realtime: true }]
+      };
+      setForm();
+    });
+
+    $("#submit-github").addEventListener("click", e => {
+      showErrors = true;
+      const { ok, first } = validate();
+      if (!ok) { e.preventDefault(); if (first) first.focus(); return; }
+      if (!REPO) {
+        e.preventDefault();
+        const sum = $("#err-summary");
+        sum.textContent = "Das Repository ist hier nicht bekannt. Auf GitHub Pages funktioniert der Button automatisch. Bis dahin den Datensatz kopieren.";
+        sum.hidden = false;
+      }
+    });
+
+    $("#copy-json").addEventListener("click", () => {
+      const btn = $("#copy-json"), text = $("#json-out").textContent;
+      const done = msg => { btn.textContent = msg; setTimeout(() => (btn.textContent = "Datensatz kopieren"), 2200); };
+      const fallback = () => {
+        $("#json-details").open = true;
+        const r = document.createRange(); r.selectNodeContents($("#json-out"));
+        const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+        done("Markiert, jetzt mit Strg/Cmd + C kopieren");
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => done("Kopiert"), fallback);
+      } else fallback();
+    });
+
+    $("#repo-hint").textContent = REPO
+      ? `Einreichungen landen als Issue in ${REPO}. Dafür ist ein GitHub-Konto nötig.`
+      : "Sobald die Seite über GitHub Pages läuft, öffnet der Button ein vorausgefülltes Issue.";
+    if (!REPO) $("#submit-github").setAttribute("aria-disabled", "true");
+
+    setForm();
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
