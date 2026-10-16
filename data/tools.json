@@ -2,9 +2,7 @@
   {
     "id": "suno",
     "name": "Suno",
-    "provider": "Suno, Inc.",
     "url": "https://suno.com",
-    "description": "Full songs with vocals from text and lyrics.",
     "status": "example",
     "modes": [
       {
@@ -28,9 +26,7 @@
   {
     "id": "udio",
     "name": "Udio",
-    "provider": "Udio",
     "url": "https://www.udio.com",
-    "description": "Songs with vocals from text and lyrics.",
     "status": "example",
     "modes": [
       {
@@ -46,9 +42,7 @@
   {
     "id": "ai-duet",
     "name": "A.I. Duet",
-    "provider": "Google Creative Lab",
     "url": "https://experiments.withgoogle.com/ai-duet",
-    "description": "Play a few notes, the AI answers.",
     "status": "example",
     "modes": [
       {
@@ -60,23 +54,5 @@
         "realtime": true
       }
     ]
-  },{
-  "id": "test-tool",
-  "name": "Test Tool",
-  "status": "submitted",
-  "modes": [
-    {
-      "name": "automatische erkennung",
-      "input_type": [
-        "text_prompt"
-      ],
-      "chronological": false,
-      "output_type": [
-        "lyrics"
-      ],
-      "interaction": "accompanies",
-      "realtime": false
-    }
-  ]
-}
+  }
 ]
