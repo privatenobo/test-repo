@@ -94,5 +94,24 @@
         "realtime": false
       }
     ]
+  },
+  {
+    "id": "aiode",
+    "name": "AIODE",
+    "status": "reviewed",
+    "modes": [
+      {
+        "name": "create stems",
+        "input_type": [
+          "audio"
+        ],
+        "chronological": false,
+        "output_type": [
+          "audio"
+        ],
+        "interaction": "accompanies",
+        "realtime": false
+      }
+    ]
   }
 ]
