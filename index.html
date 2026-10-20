@@ -19,6 +19,7 @@ html,body{height:100%}
 body{margin:0;background:var(--bg);color:var(--fg);font:400 15px/1.45 var(--sans);-webkit-font-smoothing:antialiased}
 a{color:inherit}
 :focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
 .app{display:grid;grid-template-columns:minmax(260px,.85fr) minmax(0,1.15fr) minmax(0,1.15fr);gap:28px;height:100vh;height:100dvh;padding:28px max(28px,env(safe-area-inset-right)) 28px max(28px,env(safe-area-inset-left))}
 
@@ -35,39 +36,46 @@ h1{font:500 clamp(1.7rem,2.3vw,2.4rem)/1 var(--sans);letter-spacing:.01em;text-t
 /* Panels */
 .panel{border:var(--stroke) solid var(--fg);display:flex;flex-direction:column;min-height:0;min-width:0}
 .panel-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:12px 16px;border-bottom:var(--stroke) solid var(--fg);font:400 1rem var(--mono)}
-.panel-head .aside{font-size:.78rem;color:var(--grey)}
+.panel-head .aside{font-size:.78rem;color:var(--grey);overflow-wrap:anywhere;text-align:right}
 .panel-body{flex:1;overflow:auto;padding:16px}
 .panel-foot{border-top:var(--stroke) solid var(--fg);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:16px;min-height:58px}
 .def{margin:0;font-size:.85rem;color:var(--grey)}
 .def b{color:var(--fg);font-weight:500}
+.view-tabs{display:flex;gap:16px}
+.view-tab{background:none;border:0;padding:0;font:inherit;color:var(--grey);cursor:pointer}
+.view-tab[aria-pressed="true"]{color:var(--fg);text-decoration:underline;text-underline-offset:5px;text-decoration-thickness:var(--stroke)}
 
 /* Contribute */
 .contribute{margin-top:auto;flex:none}
 .contribute .panel-body{overflow:visible}
-#contrib-classify{display:grid;gap:12px}
+#contrib-browse,#contrib-classify{display:grid;gap:12px}
 .btn{display:block;width:100%;text-align:center;padding:.75em 1em;font:500 .9rem var(--sans);border:var(--stroke) solid var(--fg);background:var(--bg);color:var(--fg);cursor:pointer;text-decoration:none;border-radius:0}
 .btn:hover{background:var(--fg);color:var(--bg)}
 .btn.is-muted{background:var(--grey);border-color:var(--grey);color:var(--bg)}
 .btn.is-muted:hover{background:var(--fg);border-color:var(--fg)}
 .note{margin:0;font-size:.82rem;color:var(--grey)}
+.notice{margin:0;font-size:.85rem;padding:8px 10px;background:var(--soft)}
 .status{margin:0;font-size:.85rem;color:var(--grey)}
 .status.is-ready{color:var(--fg)}
 .status.is-alert{color:var(--fg);font-weight:500}
 .links{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.85rem}
-.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor:pointer}
-.link:hover{text-decoration:underline}
-.json-out{margin:0;max-height:180px;overflow:auto;font:400 .72rem/1.5 var(--mono);border:var(--stroke) solid var(--fg);padding:10px;white-space:pre}
+.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor:pointer;text-decoration:underline}
+.link:hover{text-decoration-thickness:2px}
+.links .link{text-decoration:none}
+.links .link:hover{text-decoration:underline}
 
 /* Fields */
 .field{display:grid;gap:2px}
 .field label{font:400 .76rem var(--mono);color:var(--grey)}
-.field input,.len input{width:100%;font:inherit;font-size:1rem;color:var(--fg);background:transparent;border:0;border-bottom:var(--stroke) solid var(--fg);border-radius:0;padding:.35em 0}
+.field input,.len input,.text-in{width:100%;font:inherit;font-size:1rem;color:var(--fg);background:transparent;border:0;border-bottom:var(--stroke) solid var(--fg);border-radius:0;padding:.35em 0}
 
 /* Schema */
 .branch + .branch{margin-top:20px;padding-top:16px;border-top:1px solid var(--hair)}
 .branch h3{font:500 1.05rem var(--sans);margin:0}
 .dim{margin-top:10px}
 .dim-label{font:400 .76rem var(--mono);color:var(--grey);margin:0 0 6px}
+.opt{color:var(--grey);opacity:.75}
+.dim-def{margin:0 0 4px;font-size:.85rem;color:var(--grey)}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
 .chip{font:400 .9rem/1.2 var(--sans);padding:.4em .65em;border:var(--stroke) solid var(--fg);background:var(--bg);color:var(--fg);cursor:pointer;border-radius:0}
 .chip:hover{background:var(--soft)}
@@ -83,7 +91,7 @@ h1{font:500 clamp(1.7rem,2.3vw,2.4rem)/1 var(--sans);letter-spacing:.01em;text-t
 .modebar-row{display:flex;gap:16px;align-items:flex-end}
 .modebar-row .field{flex:1}
 
-/* Tool list */
+/* Tool list and preview */
 .search{margin-bottom:6px}
 .tool{padding:18px 0;border-bottom:1px solid var(--hair)}
 .tool:last-child{border-bottom:0}
@@ -97,14 +105,24 @@ h1{font:500 clamp(1.7rem,2.3vw,2.4rem)/1 var(--sans);letter-spacing:.01em;text-t
 .mode-name{font:400 .76rem var(--mono);color:var(--grey);margin:0 0 4px}
 .kv{display:grid;grid-template-columns:minmax(92px,32%) minmax(0,1fr);gap:1px 12px;margin:0;font-size:.92rem}
 .kv dt{color:var(--grey)}
-.kv dd{margin:0}
+.kv dd{margin:0;overflow-wrap:anywhere}
 .missing{color:var(--grey)}
 .empty{color:var(--grey);margin:18px 0 0}
 #preview .tool{padding-top:0}
+#text-view{height:100%;display:flex;flex-direction:column;gap:8px}
+#record-text{flex:1;width:100%;min-height:360px;font:400 .8rem/1.5 var(--mono);color:var(--fg);background:var(--bg);border:var(--stroke) solid var(--fg);border-radius:0;padding:10px;resize:vertical;tab-size:2;white-space:pre;overflow:auto}
+
+/* Check */
+.check{display:block;max-height:34%;overflow:auto}
+.check-head{margin:0;font-size:.85rem}
+.check-head b{font:400 .85rem var(--mono)}
+.check.is-ok .check-head{color:var(--grey)}
+.check-list{margin:6px 0 0;padding-left:1.1em;font-size:.82rem;display:grid;gap:3px}
 
 @media (max-width:999px){
   .app{grid-template-columns:1fr;height:auto;gap:24px}
   .intro,.panel-body{overflow:visible}
+  .check{max-height:none}
 }
 @media (prefers-reduced-motion:reduce){.mode{transition:none}}
 </style>
@@ -123,30 +141,31 @@ h1{font:500 clamp(1.7rem,2.3vw,2.4rem)/1 var(--sans);letter-spacing:.01em;text-t
       <dl class="how-list">
         <dt>Schema</dt><dd>Each tool is described by its input, its output and other features. A tool with several functions gets one mode per function.</dd>
         <dt>Browse</dt><dd>Click properties in the schema to filter the tools.</dd>
-        <dt>Contribute</dt><dd>Classify a tool and submit it on GitHub. It is added to the list after review.</dd>
+        <dt>Contribute</dt><dd>Each tool is one JSON file. Add or change one through a pull request, with the form or as text. An automatic check validates it. After the merge, this site updates.</dd>
       </dl>
     </section>
 
     <section class="panel contribute" aria-label="Contribute">
-      <header class="panel-head"><span>contribute</span><span class="aside" id="contrib-aside">github</span></header>
+      <header class="panel-head"><span>contribute</span><span class="aside" id="contrib-aside">pull request</span></header>
       <div class="panel-body">
         <div id="contrib-browse">
           <button type="button" class="btn" id="btn-classify">Classify a tool</button>
+          <p class="note">Prefer text? Add a JSON file to <a id="link-tools" target="_blank" rel="noopener">tools/</a> on GitHub. Format and rules: <a id="link-readme" target="_blank" rel="noopener">README</a>.</p>
         </div>
         <div id="contrib-classify" hidden>
           <div class="field">
             <label for="f-name">tool name *</label>
             <input id="f-name" type="text" autocomplete="off" maxlength="80">
           </div>
+          <p class="notice" id="existing" hidden></p>
           <p class="status" id="status" aria-live="polite"></p>
-          <a class="btn is-muted" id="btn-submit" href="#" target="_blank" rel="noopener">Submit on GitHub</a>
-          <p class="note">Requires a free GitHub account. Your GitHub username is shown publicly on the issue.</p>
+          <a class="btn is-muted" id="btn-submit" href="#" target="_blank" rel="noopener">Submit as pull request</a>
+          <p class="note">On GitHub: Commit or Propose changes, then Create pull request. Requires a free GitHub account; your username is shown publicly.</p>
           <div class="links">
             <button type="button" class="link" id="btn-cancel">Cancel</button>
             <button type="button" class="link" id="btn-reset">Start over</button>
             <button type="button" class="link" id="btn-copy">Copy record</button>
           </div>
-          <pre class="json-out" id="json-out" tabindex="0" hidden></pre>
         </div>
       </div>
     </section>
@@ -165,7 +184,14 @@ h1{font:500 clamp(1.7rem,2.3vw,2.4rem)/1 var(--sans);letter-spacing:.01em;text-t
   </section>
 
   <section class="panel" id="list-panel" aria-label="Tools">
-    <header class="panel-head"><span id="list-title">tools</span><span class="aside" id="list-aside"></span></header>
+    <header class="panel-head">
+      <span id="list-title">tools</span>
+      <span class="view-tabs" id="view-tabs" hidden>
+        <button type="button" class="view-tab" data-view="preview" aria-pressed="true">preview</button>
+        <button type="button" class="view-tab" data-view="text" aria-pressed="false">text</button>
+      </span>
+      <span class="aside" id="list-aside"></span>
+    </header>
     <div class="panel-body">
       <div id="tools-view">
         <div class="field search">
@@ -175,401 +201,538 @@ h1{font:500 clamp(1.7rem,2.3vw,2.4rem)/1 var(--sans);letter-spacing:.01em;text-t
         <div id="tool-list"></div>
       </div>
       <div id="preview" hidden></div>
+      <div id="text-view" hidden>
+        <label class="sr" for="record-text">Record as JSON</label>
+        <textarea id="record-text" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
+        <p class="note">This is the file that goes into the pull request. Edit it here or in the form; both stay in sync.</p>
+      </div>
     </div>
+    <footer class="panel-foot check" id="check" aria-live="polite" hidden></footer>
   </section>
 
 </div>
 
-<script>
-(() => {
-  // Only needed for a custom domain, e.g. "account/repo-name".
-  // On GitHub Pages (account.github.io/repo-name) the repository is detected automatically.
-  const REPO_OVERRIDE = "";
+<script type="module">
+// rules.js is copied from scripts/rules.mjs during the build. The GitHub check uses the same rules.
+import { validateTool, dimensions, toolId, formatRecord, isObject, LIMITS } from "./rules.js";
 
-  // Everything below is driven by data/schema.json. Supported kinds: multi, single, bool, length.
-  const $ = (s, el = document) => el.querySelector(s);
-  const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
-  const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-  const MAX_LENGTH = 100000;
+// Only needed for a custom domain, e.g. "account/repo-name".
+// On GitHub Pages (account.github.io/repo-name) the repository is detected automatically.
+const REPO_OVERRIDE = "";
+const BRANCH = "main";
+const MAX_URL = 6000;
 
-  let SCHEMA = null, TOOLS = [], DIMS = [];
-  let mode = "browse";
-  const filters = {};
-  let query = "";
-  let draft = null;
-  let active = 0;
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
-  const val = id => (SCHEMA.values[id] || { label: id, def: "" });
-  const dim = id => DIMS.find(d => d.id === id);
-  const short = d => d.short || d.label;
-  const STATUS = { example: "example", submitted: "submitted" };
-  const DEF_DEFAULT = "Point at a property to see what it means.";
+let SCHEMA = null, TOOLS = [], DIMS = [];
+let mode = "browse";
+let view = "preview";
+const filters = {};
+let query = "";
+let record = null;
+let active = 0;
+let loadedId = null;
+let textError = null;
+let problems = [];
 
-  const emptyMode = () => {
-    const m = { name: "" };
-    DIMS.forEach(d => (m[d.id] = d.kind === "multi" ? [] : null));
-    return m;
-  };
-  const emptyDraft = () => ({ name: "", modes: [emptyMode()] });
+const val = id => (SCHEMA.values[id] || { label: String(id), def: "" });
+const dim = id => DIMS.find(d => d.id === id);
+const short = d => d.short || d.label;
+const DEF_DEFAULT = "Point at a property to see what it means.";
 
-  async function fetchJson(path) {
-    let res;
-    try { res = await fetch(path, { cache: "no-cache" }); }
-    catch (e) { throw new Error(`${path} could not be loaded.`); }
-    if (!res.ok) throw new Error(`${path} was not found (error ${res.status}).`);
-    const text = await res.text();
-    try { return JSON.parse(text); }
-    catch (e) { throw new Error(`${path} has a format error: ${e.message}`); }
+const emptyMode = () => {
+  const m = { name: "" };
+  DIMS.forEach(d => (m[d.id] = d.kind === "multi" ? [] : null));
+  return m;
+};
+const emptyRecord = () => ({ name: "", modes: [emptyMode()] });
+
+function detectRepo() {
+  if (REPO_OVERRIDE) return REPO_OVERRIDE;
+  const m = location.hostname.match(/^([^.]+)\.github\.io$/i);
+  if (!m) return null;
+  const seg = location.pathname.split("/").filter(Boolean)[0];
+  return seg && !seg.includes(".") ? `${m[1]}/${seg}` : `${m[1]}/${location.hostname}`;
+}
+const REPO = detectRepo();
+
+async function fetchJson(path) {
+  let res;
+  try { res = await fetch(path, { cache: "no-cache" }); }
+  catch (e) { throw new Error(`${path} could not be loaded.`); }
+  if (!res.ok) throw new Error(`${path} was not found (error ${res.status}).`);
+  const text = await res.text();
+  try { return JSON.parse(text); }
+  catch (e) { throw new Error(`${path} has a format error: ${e.message}`); }
+}
+
+async function init() {
+  try {
+    [SCHEMA, TOOLS] = await Promise.all([fetchJson("data/schema.json"), fetchJson("data/tools.json")]);
+  } catch (err) {
+    const msg = `<p class="def"><b>Data could not be loaded.</b> ${esc(err.message)}</p>`;
+    $("#schema-content").innerHTML = msg;
+    $("#tool-list").innerHTML = msg;
+    return;
   }
-
-  async function init() {
-    try {
-      [SCHEMA, TOOLS] = await Promise.all([fetchJson("data/schema.json"), fetchJson("data/tools.json")]);
-    } catch (err) {
-      const msg = `<p class="def"><b>Data could not be loaded.</b> ${esc(err.message)}</p>`;
-      $("#schema-content").innerHTML = msg;
-      $("#tool-list").innerHTML = msg;
-      return;
-    }
-    DIMS = SCHEMA.branches.flatMap(b => b.dimensions.map(d => ({ ...d, branch: b.id })));
-    draft = emptyDraft();
-    $("#version").textContent = SCHEMA.version;
-    renderSchema();
-    bind();
-    updateUI();
+  DIMS = dimensions(SCHEMA);
+  record = emptyRecord();
+  $("#version").textContent = SCHEMA.version;
+  if (REPO) {
+    $("#link-tools").href = `https://github.com/${REPO}/tree/${BRANCH}/tools`;
+    $("#link-readme").href = `https://github.com/${REPO}#contributing`;
   }
+  renderSchema();
+  bind();
+  updateUI();
+}
 
-  /* ---------- Values ---------- */
-  function fmtText(d, v) {
-    if (d.kind === "multi") return v && v.length ? v.map(x => val(x).label).join(", ") : null;
-    if (d.kind === "bool") return v === true ? "Yes" : v === false ? "No" : null;
-    if (d.kind === "single") return v ? val(v).label : null;
-    if (d.kind === "length") {
-      if (!v || !v.unit) return null;
+/* ---------- Values ---------- */
+function fmtText(d, v) {
+  if (v === undefined || v === null) return null;
+  switch (d.kind) {
+    case "multi": return Array.isArray(v) && v.length ? v.map(x => val(x).label).join(", ") : null;
+    case "bool": return v === true ? "Yes" : v === false ? "No" : null;
+    case "single": return typeof v === "string" && v ? val(v).label : null;
+    case "length":
+      if (!isObject(v) || typeof v.unit !== "string") return null;
       if (!val(v.unit).numeric) return val(v.unit).label;
-      return v.value > 0 ? `${v.value} ${val(v.unit).label.toLowerCase()}` : null;
-    }
-    return null;
+      return typeof v.value === "number" && v.value > 0 ? `${v.value} ${val(v.unit).label.toLowerCase()}` : null;
+    case "text": return typeof v === "string" && v.trim() ? v.trim() : null;
   }
-  const missing = () => `<span class="missing">—</span>`;
-  const fmt = (d, v) => { const t = fmtText(d, v); return t === null ? missing() : esc(t); };
+  return null;
+}
+const missing = () => `<span class="missing">—</span>`;
+const fmt = (d, v) => { const t = fmtText(d, v); return t === null ? missing() : esc(t); };
 
-  /* ---------- Schema chips ---------- */
-  function options(d) {
-    return d.kind === "bool" ? [["true", "Yes"], ["false", "No"]] : d.values.map(v => [v, val(v).label]);
-  }
-  function renderSchema() {
-    $("#schema-content").innerHTML = SCHEMA.branches.map(b => `
-      <div class="branch">
-        <h3>${esc(b.label)}</h3>
-        ${b.dimensions.map(d => `
-          <div class="dim">
-            <p class="dim-label">${esc(d.label)}</p>
-            <div class="chips">${options(d).map(([v, l]) =>
-              `<button type="button" class="chip" data-dim="${d.id}" data-val="${esc(v)}" aria-pressed="false">${esc(l)}</button>`).join("")}</div>
-            ${d.kind === "length" ? `
-              <div class="len" data-len="${d.id}" hidden>
-                <span>max.</span>
-                <input type="number" min="1" max="${MAX_LENGTH}" step="any" inputmode="decimal" data-len-input="${d.id}" aria-label="${esc(d.label)} value">
-                <span data-len-unit="${d.id}"></span>
-              </div>` : ""}
-          </div>`).join("")}
-      </div>`).join("");
-  }
-  function isOn(m, d, v) {
-    const x = m[d.id];
-    if (d.kind === "multi") return (x || []).includes(v);
-    if (d.kind === "bool") return x === (v === "true");
-    if (d.kind === "length") return !!x && x.unit === v;
-    return x === v;
-  }
-  function filterOn(d, v) {
-    const f = filters[d.id];
-    if (d.kind === "bool") return f === (v === "true");
-    return !!(f && f.has(v));
-  }
-  const chipOn = (d, v) => (mode === "browse" ? filterOn(d, v) : isOn(draft.modes[active], d, v));
-  function refreshLength(d) {
-    const box = $(`[data-len="${d.id}"]`);
-    const x = mode === "classify" ? draft.modes[active][d.id] : null;
-    const show = !!(x && val(x.unit).numeric);
-    box.hidden = !show;
-    if (show) {
-      $(`[data-len-input="${d.id}"]`).value = x.value ?? "";
-      $(`[data-len-unit="${d.id}"]`).textContent = val(x.unit).label.toLowerCase();
-    }
-  }
-  function refreshChips(dimId) {
-    $$(dimId ? `.chip[data-dim="${dimId}"]` : ".chip", $("#schema-content"))
-      .forEach(c => c.setAttribute("aria-pressed", String(chipOn(dim(c.dataset.dim), c.dataset.val))));
-    DIMS.filter(d => d.kind === "length" && (!dimId || dimId === d.id)).forEach(refreshLength);
-  }
-  function showDef(chip) {
-    const d = dim(chip.dataset.dim), v = chip.dataset.val;
-    let label, text;
-    if (d.kind === "bool") [label, text] = [d.label, d.def];
-    else if (d.kind === "length") [label, text] = [`${d.label} · ${val(v).label}`, `${d.def} ${val(v).def}`];
-    else [label, text] = [val(v).label, val(v).def];
-    $("#def").innerHTML = `<b>${esc(label)}</b> ${esc(text)}`;
-  }
-
-  /* ---------- Tool list ---------- */
-  function activeFilters() {
-    return DIMS.filter(d => (d.kind === "bool" ? typeof filters[d.id] === "boolean" : filters[d.id] && filters[d.id].size));
-  }
-  function modeMatches(m, act) {
-    return act.every(d => {
-      const f = filters[d.id], x = m[d.id];
-      if (d.kind === "bool") return x === f;
-      if (d.kind === "multi") return (x || []).some(v => f.has(v));
-      if (d.kind === "length") return !!x && f.has(x.unit);
-      return f.has(x);
-    });
-  }
-  function safeUrl(u) {
-    try { const x = new URL(u); return /^https?:$/.test(x.protocol) ? x : null; } catch { return null; }
-  }
-  function modeHtml(m, dimmed) {
-    return `<div class="mode${dimmed ? " is-dim" : ""}">
-      <p class="mode-name">${esc(m.name || "Unnamed mode")}</p>
-      <dl class="kv">${DIMS.map(d => `<dt>${esc(short(d))}</dt><dd>${fmt(d, m[d.id])}</dd>`).join("")}</dl>
-    </div>`;
-  }
-  function toolHtml(t, matchFn) {
-    const u = safeUrl(t.url);
-    const name = esc(t.name || "Tool name");
-    return `<article class="tool">
-      <div class="tool-head">
-        <h3 class="tool-name">${u ? `<a href="${esc(u.href)}" target="_blank" rel="noopener">${name} ↗</a>` : name}</h3>
-        ${STATUS[t.status] ? `<span class="tag">${STATUS[t.status]}</span>` : ""}
-      </div>
-      ${(t.modes || []).map(m => modeHtml(m, matchFn ? !matchFn(m) : false)).join("")}
-    </article>`;
-  }
-  function renderTools() {
-    const act = activeFilters();
-    const matchFn = act.length ? m => modeMatches(m, act) : null;
-    const searchOk = t => !query || [t.name, ...(t.modes || []).map(m => m.name)].join(" ").toLowerCase().includes(query);
-    const shown = TOOLS.filter(t => searchOk(t) && (!matchFn || (t.modes || []).some(matchFn)));
-    $("#tool-list").innerHTML = shown.length ? shown.map(t => toolHtml(t, matchFn)).join("") : `<p class="empty">No tool matches.</p>`;
-    $("#list-aside").textContent = mode === "browse" ? (act.length || query ? `${shown.length} / ${TOOLS.length}` : String(TOOLS.length)) : "draft";
-    $("#btn-clear").hidden = !(mode === "browse" && (act.length || query));
-  }
-
-  /* ---------- Entry ---------- */
-  function detectRepo() {
-    if (REPO_OVERRIDE) return REPO_OVERRIDE;
-    const m = location.hostname.match(/^([^.]+)\.github\.io$/i);
-    if (!m) return null;
-    const seg = location.pathname.split("/").filter(Boolean)[0];
-    return seg && !seg.includes(".") ? `${m[1]}/${seg}` : `${m[1]}/${location.hostname}`;
-  }
-  const REPO = detectRepo();
-
-  const slug = s => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-  function buildEntry() {
-    return {
-      id: slug(draft.name) || "unnamed",
-      name: draft.name.trim(),
-      status: "submitted",
-      modes: draft.modes.map((m, i) => {
-        const out = { name: m.name.trim() || `Mode ${i + 1}` };
-        DIMS.forEach(d => {
-          const x = m[d.id];
-          if (d.kind === "multi") out[d.id] = d.values.filter(v => x.includes(v));
-          else if (d.kind === "length") out[d.id] = !x ? null : val(x.unit).numeric ? { unit: x.unit, value: x.value } : { unit: x.unit };
-          else out[d.id] = x;
-        });
-        return out;
-      })
-    };
-  }
-  function problems() {
-    const out = [];
-    if (!draft.name.trim()) out.push("tool name");
-    draft.modes.forEach((m, i) => {
-      const miss = [];
-      DIMS.forEach(d => {
-        const x = m[d.id], s = short(d).toLowerCase();
-        if (d.kind === "multi" && !x.length) miss.push(s);
-        else if ((d.kind === "single" || d.kind === "bool") && x === null) miss.push(s);
-        else if (d.kind === "length") {
-          if (!x) miss.push(s);
-          else if (val(x.unit).numeric && !(x.value > 0 && x.value <= MAX_LENGTH)) miss.push(`${s} value`);
-        }
-      });
-      if (miss.length) out.push(`${draft.modes.length > 1 ? `mode ${i + 1}: ` : ""}${miss.join(", ")}`);
-    });
-    return out;
-  }
-  function issueUrl(entry) {
-    const cell = (d, v) => fmtText(d, v) ?? "–";
-    const body = [
-      `**Tool:** ${entry.name}`,
-      "",
-      `| Mode | ${DIMS.map(short).join(" | ")} |`,
-      `|${"---|".repeat(DIMS.length + 1)}`,
-      ...entry.modes.map(m => `| ${m.name} | ${DIMS.map(d => cell(d, m[d.id])).join(" | ")} |`),
-      "",
-      "**Record for `data/tools.json`**",
-      "```json",
-      JSON.stringify(entry, null, 2),
-      "```"
-    ].join("\n");
-    return `https://github.com/${REPO}/issues/new?${new URLSearchParams({ title: `New tool: ${entry.name}`, body })}`;
-  }
-  function updateEntry() {
-    const entry = buildEntry();
-    const p = problems();
-    $("#preview").innerHTML = toolHtml({ ...entry, name: entry.name || "Tool name", status: "" });
-    $("#json-out").textContent = JSON.stringify(entry, null, 2);
-    $("#btn-submit").href = REPO && !p.length ? issueUrl(entry) : "#";
-    $("#btn-submit").classList.toggle("is-muted", p.length > 0);
-    const status = $("#status");
-    status.classList.toggle("is-ready", !p.length);
-    status.classList.remove("is-alert");
-    status.textContent = p.length ? `Missing: ${p.join("; ")}.` : "Ready to submit.";
-  }
-
-  /* ---------- Mode bar ---------- */
-  function renderModebar() {
-    const m = draft.modes[active];
-    $("#modebar").innerHTML = `
-      <div class="tabs">
-        ${draft.modes.map((x, i) => `<button type="button" class="tab" data-i="${i}" aria-pressed="${i === active}">${esc(x.name || `Mode ${i + 1}`)}</button>`).join("")}
-        <button type="button" class="tab tab-add" id="add-mode">+ mode</button>
-      </div>
-      <div class="modebar-row">
-        <div class="field"><label for="mode-name">mode name, e.g. create song</label><input id="mode-name" type="text" autocomplete="off" maxlength="60" value="${esc(m.name)}"></div>
-        ${draft.modes.length > 1 ? `<button type="button" class="link" id="remove-mode">Remove</button>` : ""}
-      </div>`;
-  }
-
-  /* ---------- UI state ---------- */
-  function updateUI() {
-    const c = mode === "classify";
-    $("#contrib-browse").hidden = c;
-    $("#contrib-classify").hidden = !c;
-    $("#contrib-aside").textContent = c ? "draft" : "github";
-    $("#schema-aside").textContent = c ? "click to classify" : "click to filter";
-    $("#list-title").textContent = c ? "preview" : "tools";
-    $("#tools-view").hidden = c;
-    $("#preview").hidden = !c;
-    $("#modebar").hidden = !c;
-    $("#json-out").hidden = true;
-    if (c) renderModebar();
-    refreshChips();
-    renderTools();
-    updateEntry();
-  }
-  function setMode(next) {
-    mode = next;
-    updateUI();
-    if (next === "classify") $("#f-name").focus();
-  }
-
-  /* ---------- Events ---------- */
-  function bind() {
-    $("#schema-content").addEventListener("click", e => {
-      const c = e.target.closest(".chip");
-      if (!c) return;
-      const d = dim(c.dataset.dim), v = c.dataset.val;
-      if (mode === "browse") {
-        if (d.kind === "bool") { const b = v === "true"; filters[d.id] = filters[d.id] === b ? undefined : b; }
-        else { const s = filters[d.id] || (filters[d.id] = new Set()); s.has(v) ? s.delete(v) : s.add(v); }
-        refreshChips(d.id);
-        renderTools();
-      } else {
-        const m = draft.modes[active];
-        if (d.kind === "multi") m[d.id] = m[d.id].includes(v) ? m[d.id].filter(x => x !== v) : [...m[d.id], v];
-        else if (d.kind === "bool") { const b = v === "true"; m[d.id] = m[d.id] === b ? null : b; }
-        else if (d.kind === "length") m[d.id] = m[d.id] && m[d.id].unit === v ? null : { unit: v, value: null };
-        else m[d.id] = m[d.id] === v ? null : v;
-        refreshChips(d.id);
-        updateEntry();
-        if (d.kind === "length" && m[d.id] && val(v).numeric) $(`[data-len-input="${d.id}"]`).focus();
+/* ---------- Schema panel ---------- */
+function options(d) {
+  if (d.kind === "bool") return [["true", "Yes"], ["false", "No"]];
+  if (d.kind === "text") return [];
+  return d.values.map(v => [v, val(v).label]);
+}
+function renderSchema() {
+  $("#schema-content").innerHTML = SCHEMA.branches.map(b => `
+    <div class="branch">
+      <h3>${esc(b.label)}</h3>
+      ${b.dimensions.map(d0 => {
+        const d = dim(d0.id);
+        return `<div class="dim">
+          <p class="dim-label">${esc(d.label)}${d.optional ? ` <span class="opt">· optional</span>` : ""}</p>
+          ${d.kind === "text"
+            ? `<p class="dim-def">${esc(d.def || "Free text.")} Searchable.</p>
+               <input class="text-in" type="text" data-text="${d.id}" maxlength="${d.max || LIMITS.text}" aria-label="${esc(d.label)}" autocomplete="off" hidden>`
+            : `<div class="chips">${options(d).map(([v, l]) =>
+                `<button type="button" class="chip" data-dim="${d.id}" data-val="${esc(v)}" aria-pressed="false">${esc(l)}</button>`).join("")}</div>`}
+          ${d.kind === "length" ? `
+            <div class="len" data-len="${d.id}" hidden>
+              <span>max.</span>
+              <input type="number" min="1" max="${LIMITS.length}" step="any" inputmode="decimal" data-len-input="${d.id}" aria-label="${esc(d.label)} value">
+              <span data-len-unit="${d.id}"></span>
+            </div>` : ""}
+        </div>`;
+      }).join("")}
+    </div>`).join("");
+}
+function currentMode() {
+  const modes = Array.isArray(record.modes) ? record.modes : [];
+  return isObject(modes[active]) ? modes[active] : null;
+}
+function ensureMode() {
+  if (!Array.isArray(record.modes)) record.modes = [];
+  if (!record.modes.length) record.modes.push(emptyMode());
+  active = Math.min(active, record.modes.length - 1);
+  if (!isObject(record.modes[active])) record.modes[active] = emptyMode();
+  return record.modes[active];
+}
+function isOn(m, d, v) {
+  if (!m) return false;
+  const x = m[d.id];
+  if (d.kind === "multi") return Array.isArray(x) && x.includes(v);
+  if (d.kind === "bool") return x === (v === "true");
+  if (d.kind === "length") return isObject(x) && x.unit === v;
+  return x === v;
+}
+function filterOn(d, v) {
+  const f = filters[d.id];
+  if (d.kind === "bool") return f === (v === "true");
+  return !!(f && f.has(v));
+}
+function refreshSchema() {
+  const m = currentMode();
+  $$(".chip", $("#schema-content")).forEach(c => {
+    const d = dim(c.dataset.dim), v = c.dataset.val;
+    c.setAttribute("aria-pressed", String(mode === "browse" ? filterOn(d, v) : isOn(m, d, v)));
+  });
+  DIMS.forEach(d => {
+    if (d.kind === "length") {
+      const x = m && m[d.id];
+      const show = mode === "classify" && isObject(x) && !!val(x.unit).numeric;
+      $(`[data-len="${d.id}"]`).hidden = !show;
+      if (show) {
+        const inp = $(`[data-len-input="${d.id}"]`);
+        if (document.activeElement !== inp) inp.value = typeof x.value === "number" ? x.value : "";
+        $(`[data-len-unit="${d.id}"]`).textContent = val(x.unit).label.toLowerCase();
       }
-      showDef(c);
-    });
-    $("#schema-content").addEventListener("input", e => {
-      const id = e.target.dataset.lenInput;
-      if (!id || mode !== "classify") return;
-      const x = draft.modes[active][id];
-      if (!x) return;
+    }
+    if (d.kind === "text") {
+      const inp = $(`[data-text="${d.id}"]`);
+      inp.hidden = mode !== "classify";
+      if (document.activeElement !== inp) inp.value = m && typeof m[d.id] === "string" ? m[d.id] : "";
+    }
+  });
+}
+function showDef(chip) {
+  const d = dim(chip.dataset.dim), v = chip.dataset.val;
+  let label, text;
+  if (d.kind === "bool") [label, text] = [d.label, d.def];
+  else if (d.kind === "length") [label, text] = [`${d.label} · ${val(v).label}`, `${d.def} ${val(v).def}`];
+  else [label, text] = [val(v).label, val(v).def];
+  $("#def").innerHTML = `<b>${esc(label)}</b> ${esc(text)}`;
+}
+
+/* ---------- Tool list ---------- */
+function activeFilters() {
+  return DIMS.filter(d => (d.kind === "bool" ? typeof filters[d.id] === "boolean" : filters[d.id] && filters[d.id].size));
+}
+function modeMatches(m, act) {
+  return act.every(d => {
+    const f = filters[d.id], x = m[d.id];
+    if (d.kind === "bool") return x === f;
+    if (d.kind === "multi") return Array.isArray(x) && x.some(v => f.has(v));
+    if (d.kind === "length") return isObject(x) && f.has(x.unit);
+    return f.has(x);
+  });
+}
+function safeUrl(u) {
+  if (typeof u !== "string") return null;
+  try { const x = new URL(u); return /^https?:$/.test(x.protocol) ? x : null; } catch { return null; }
+}
+function modeHtml(m, dimmed) {
+  const mm = isObject(m) ? m : {};
+  return `<div class="mode${dimmed ? " is-dim" : ""}">
+    <p class="mode-name">${esc(typeof mm.name === "string" && mm.name.trim() ? mm.name : "Unnamed mode")}</p>
+    <dl class="kv">${DIMS.map(d => `<dt>${esc(short(d))}</dt><dd>${fmt(d, mm[d.id])}</dd>`).join("")}</dl>
+  </div>`;
+}
+function toolHtml(t, matchFn) {
+  const u = safeUrl(t.url);
+  const name = esc(typeof t.name === "string" && t.name.trim() ? t.name : "Tool name");
+  const modes = Array.isArray(t.modes) ? t.modes : [];
+  return `<article class="tool">
+    <div class="tool-head">
+      <h3 class="tool-name">${u ? `<a href="${esc(u.href)}" target="_blank" rel="noopener">${name} ↗</a>` : name}</h3>
+      ${t.status === "example" ? `<span class="tag">example</span>` : ""}
+    </div>
+    ${modes.map(m => modeHtml(m, matchFn ? !matchFn(m) : false)).join("")}
+  </article>`;
+}
+function searchText(t) {
+  const texts = DIMS.filter(d => d.kind === "text");
+  return [t.name, ...(t.modes || []).flatMap(m => [m.name, ...texts.map(d => m[d.id] || "")])].join(" ").toLowerCase();
+}
+function renderTools() {
+  if (mode !== "browse") return;
+  const act = activeFilters();
+  const matchFn = act.length ? m => modeMatches(m, act) : null;
+  const shown = TOOLS.filter(t => (!query || searchText(t).includes(query)) && (!matchFn || (t.modes || []).some(matchFn)));
+  $("#tool-list").innerHTML = shown.length ? shown.map(t => toolHtml(t, matchFn)).join("") : `<p class="empty">No tool matches.</p>`;
+  $("#list-aside").textContent = act.length || query ? `${shown.length} / ${TOOLS.length}` : String(TOOLS.length);
+  $("#btn-clear").hidden = !(act.length || query);
+}
+
+/* ---------- Record ---------- */
+function existingTool() {
+  const key = toolId(record.name);
+  return key ? TOOLS.find(t => t.id === key || toolId(t.name) === key) || null : null;
+}
+function fileId() {
+  const ex = existingTool();
+  return ex ? ex.id : toolId(record.name);
+}
+function submitTarget() {
+  const ex = existingTool(), id = fileId();
+  if (!REPO || !id) return { href: "#", prefilled: false, update: false };
+  if (ex) return { href: `https://github.com/${REPO}/edit/${BRANCH}/tools/${ex.id}.json`, prefilled: false, update: true };
+  const base = `https://github.com/${REPO}/new/${BRANCH}/tools?filename=${encodeURIComponent(id + ".json")}`;
+  const full = `${base}&value=${encodeURIComponent(formatRecord(record))}`;
+  return full.length <= MAX_URL ? { href: full, prefilled: true, update: false } : { href: base, prefilled: false, update: false };
+}
+function renderCheck() {
+  const box = $("#check");
+  box.classList.toggle("is-ok", !textError && !problems.length);
+  if (textError) {
+    box.innerHTML = `<p class="check-head"><b>check</b> The text is not valid JSON.</p><ul class="check-list"><li>${esc(textError)}</li></ul>`;
+  } else if (problems.length) {
+    box.innerHTML = `<p class="check-head"><b>check</b> ${problems.length} problem${problems.length > 1 ? "s" : ""}</p>
+      <ul class="check-list">${problems.map(p => `<li>${esc(p)}</li>`).join("")}</ul>`;
+  } else {
+    box.innerHTML = `<p class="check-head"><b>check</b> Passed. The same check runs on the pull request.</p>`;
+  }
+}
+function syncText() {
+  $("#record-text").value = formatRecord(record);
+  textError = null;
+}
+function syncName() {
+  const inp = $("#f-name");
+  if (document.activeElement !== inp) inp.value = typeof record.name === "string" ? record.name : "";
+}
+
+// source: "form" (form changed the record), "text" (text view changed it), "ui" (nothing changed)
+function update(source = "ui") {
+  if (mode !== "classify") return;
+  if (source === "form") syncText();
+  problems = textError ? [] : validateTool(record, SCHEMA);
+  if (!textError && typeof record.name === "string" && record.name.trim() && !toolId(record.name)) {
+    problems.unshift("The tool name needs at least one letter or digit.");
+  }
+
+  const ex = existingTool(), id = fileId();
+  $("#list-aside").textContent = id ? `tools/${id}.json` : "tools/….json";
+  $("#preview").innerHTML = toolHtml(record, null);
+  renderCheck();
+
+  const notice = $("#existing");
+  notice.hidden = !ex;
+  if (ex && loadedId === ex.id) notice.innerHTML = `Editing <b>${esc(ex.name)}</b>. Submitting proposes an update to its file.`;
+  else if (ex) notice.innerHTML = `<b>${esc(ex.name)}</b> is already listed. <button type="button" class="link" id="btn-load">Load its entry</button> to keep its modes and add yours.`;
+
+  const ready = !textError && !problems.length;
+  const target = submitTarget();
+  const btn = $("#btn-submit");
+  btn.href = ready ? target.href : "#";
+  btn.textContent = target.update ? "Propose update as pull request" : "Submit as pull request";
+  btn.classList.toggle("is-muted", !ready);
+
+  const status = $("#status");
+  status.classList.remove("is-alert");
+  status.classList.toggle("is-ready", ready);
+  status.textContent = textError ? "The text is not valid JSON. See check."
+    : problems.length ? `${problems.length} problem${problems.length > 1 ? "s" : ""} left. See check.`
+    : "Ready to submit.";
+}
+
+/* ---------- Copy ---------- */
+function copyNow(text) {
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.setAttribute("readonly", "");
+  ta.style.cssText = "position:fixed;top:0;left:0;width:1px;height:1px;opacity:0";
+  const focused = document.activeElement;
+  document.body.appendChild(ta);
+  ta.select();
+  let ok = false;
+  try { ok = document.execCommand("copy"); } catch {}
+  ta.remove();
+  if (focused && focused.focus) focused.focus();
+  if (!ok && navigator.clipboard) navigator.clipboard.writeText(text).catch(() => {});
+  return ok;
+}
+
+/* ---------- Mode bar ---------- */
+function renderModebar() {
+  const modes = Array.isArray(record.modes) ? record.modes : [];
+  const label = (x, i) => (isObject(x) && typeof x.name === "string" && x.name.trim() ? x.name : `Mode ${i + 1}`);
+  const m = currentMode();
+  $("#modebar").innerHTML = `
+    <div class="tabs">
+      ${modes.map((x, i) => `<button type="button" class="tab" data-i="${i}" aria-pressed="${i === active}">${esc(label(x, i))}</button>`).join("")}
+      ${modes.length < LIMITS.modes ? `<button type="button" class="tab tab-add" id="add-mode">+ mode</button>` : ""}
+    </div>
+    ${modes.length ? `<div class="modebar-row">
+      <div class="field"><label for="mode-name">mode name, e.g. create song</label><input id="mode-name" type="text" autocomplete="off" maxlength="${LIMITS.modeName}" value="${esc(m && typeof m.name === "string" ? m.name : "")}"></div>
+      ${modes.length > 1 ? `<button type="button" class="link" id="remove-mode">Remove</button>` : ""}
+    </div>` : ""}`;
+}
+
+/* ---------- UI state ---------- */
+function updateUI() {
+  const c = mode === "classify";
+  $("#contrib-browse").hidden = c;
+  $("#contrib-classify").hidden = !c;
+  $("#contrib-aside").textContent = c ? "draft" : "pull request";
+  $("#schema-aside").textContent = c ? "click to classify" : "click to filter";
+  $("#list-title").hidden = c;
+  $("#view-tabs").hidden = !c;
+  $$(".view-tab").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.view === view)));
+  $("#tools-view").hidden = c;
+  $("#preview").hidden = !c || view !== "preview";
+  $("#text-view").hidden = !c || view !== "text";
+  $("#check").hidden = !c;
+  $("#modebar").hidden = !c;
+  $("#btn-clear").hidden = true;
+  if (c) renderModebar();
+  refreshSchema();
+  renderTools();
+  update("ui");
+}
+function setMode(next) {
+  const first = next === "classify" && !$("#record-text").value;
+  mode = next;
+  updateUI();
+  if (first) update("form");
+  if (next === "classify") $("#f-name").focus();
+}
+function formChanged() {
+  refreshSchema();
+  update("form");
+}
+
+/* ---------- Events ---------- */
+function bind() {
+  $("#schema-content").addEventListener("click", e => {
+    const c = e.target.closest(".chip");
+    if (!c) return;
+    const d = dim(c.dataset.dim), v = c.dataset.val;
+    if (mode === "browse") {
+      if (d.kind === "bool") { const b = v === "true"; filters[d.id] = filters[d.id] === b ? undefined : b; }
+      else { const s = filters[d.id] || (filters[d.id] = new Set()); s.has(v) ? s.delete(v) : s.add(v); }
+      refreshSchema();
+      renderTools();
+    } else {
+      const hadModes = Array.isArray(record.modes) && record.modes.length;
+      const m = ensureMode();
+      const x = m[d.id];
+      if (d.kind === "multi") {
+        const arr = Array.isArray(x) ? x : [];
+        const next = arr.includes(v) ? arr.filter(y => y !== v) : [...arr, v];
+        m[d.id] = [...d.values.filter(y => next.includes(y)), ...next.filter(y => !d.values.includes(y))];
+      } else if (d.kind === "bool") {
+        const b = v === "true";
+        m[d.id] = x === b ? null : b;
+      } else if (d.kind === "length") {
+        m[d.id] = isObject(x) && x.unit === v ? null : val(v).numeric ? { unit: v, value: null } : { unit: v };
+      } else {
+        m[d.id] = x === v ? null : v;
+      }
+      if (!hadModes) renderModebar();
+      formChanged();
+      if (d.kind === "length" && isObject(m[d.id]) && val(v).numeric) $(`[data-len-input="${d.id}"]`).focus();
+    }
+    showDef(c);
+  });
+  $("#schema-content").addEventListener("input", e => {
+    if (mode !== "classify") return;
+    const lenId = e.target.dataset.lenInput, textId = e.target.dataset.text;
+    if (lenId) {
+      const x = ensureMode()[lenId];
+      if (!isObject(x)) return;
       const n = parseFloat(e.target.value);
       x.value = Number.isFinite(n) && n > 0 ? n : null;
-      updateEntry();
-    });
-    $("#schema-content").addEventListener("mouseover", e => { const c = e.target.closest(".chip"); if (c) showDef(c); });
-    $("#schema-content").addEventListener("focusin", e => { const c = e.target.closest(".chip"); if (c) showDef(c); });
-    $("#schema-content").addEventListener("mouseleave", () => ($("#def").textContent = DEF_DEFAULT));
+      update("form");
+    } else if (textId) {
+      ensureMode()[textId] = e.target.value.trim() ? e.target.value : null;
+      update("form");
+    }
+  });
+  $("#schema-content").addEventListener("mouseover", e => { const c = e.target.closest(".chip"); if (c) showDef(c); });
+  $("#schema-content").addEventListener("focusin", e => { const c = e.target.closest(".chip"); if (c) showDef(c); });
+  $("#schema-content").addEventListener("mouseleave", () => ($("#def").textContent = DEF_DEFAULT));
 
-    $("#modebar").addEventListener("click", e => {
-      const tab = e.target.closest(".tab[data-i]");
-      if (tab) { active = +tab.dataset.i; renderModebar(); refreshChips(); return; }
-      if (e.target.closest("#add-mode")) {
-        draft.modes.push(emptyMode()); active = draft.modes.length - 1;
-        renderModebar(); refreshChips(); updateEntry(); $("#mode-name").focus(); return;
-      }
-      if (e.target.closest("#remove-mode")) {
-        draft.modes.splice(active, 1); active = Math.max(0, active - 1);
-        renderModebar(); refreshChips(); updateEntry();
-      }
-    });
-    $("#modebar").addEventListener("input", e => {
-      if (e.target.id !== "mode-name") return;
-      draft.modes[active].name = e.target.value;
-      $(`.tab[data-i="${active}"]`).textContent = e.target.value || `Mode ${active + 1}`;
-      updateEntry();
-    });
+  $("#modebar").addEventListener("click", e => {
+    const tab = e.target.closest(".tab[data-i]");
+    if (tab) { active = +tab.dataset.i; renderModebar(); refreshSchema(); return; }
+    if (e.target.closest("#add-mode")) {
+      if (!Array.isArray(record.modes)) record.modes = [];
+      record.modes.push(emptyMode());
+      active = record.modes.length - 1;
+      renderModebar(); formChanged(); $("#mode-name").focus();
+      return;
+    }
+    if (e.target.closest("#remove-mode")) {
+      record.modes.splice(active, 1);
+      active = Math.max(0, active - 1);
+      renderModebar(); formChanged();
+    }
+  });
+  $("#modebar").addEventListener("input", e => {
+    if (e.target.id !== "mode-name") return;
+    ensureMode().name = e.target.value;
+    $(`.tab[data-i="${active}"]`).textContent = e.target.value.trim() ? e.target.value : `Mode ${active + 1}`;
+    update("form");
+  });
 
-    $("#f-name").addEventListener("input", e => { draft.name = e.target.value; updateEntry(); });
+  $("#f-name").addEventListener("input", e => { record.name = e.target.value; update("form"); });
+  $("#existing").addEventListener("click", e => {
+    if (!e.target.closest("#btn-load")) return;
+    const ex = existingTool();
+    if (!ex) return;
+    const { id, ...file } = JSON.parse(JSON.stringify(ex));
+    record = file;
+    loadedId = ex.id;
+    active = 0;
+    $("#f-name").value = record.name;
+    renderModebar(); formChanged();
+  });
 
-    $("#search").addEventListener("input", e => { query = e.target.value.trim().toLowerCase(); renderTools(); });
-    $("#btn-clear").addEventListener("click", () => {
-      Object.keys(filters).forEach(k => delete filters[k]);
-      query = ""; $("#search").value = "";
-      refreshChips(); renderTools();
-    });
+  $("#view-tabs").addEventListener("click", e => {
+    const b = e.target.closest(".view-tab");
+    if (!b) return;
+    view = b.dataset.view;
+    updateUI();
+  });
+  $("#record-text").addEventListener("input", e => {
+    let parsed;
+    try { parsed = JSON.parse(e.target.value); }
+    catch (err) { textError = err.message; update("text"); return; }
+    if (!isObject(parsed)) { textError = "The record must be one JSON object: { … }."; update("text"); return; }
+    textError = null;
+    record = parsed;
+    const count = Array.isArray(record.modes) ? record.modes.length : 0;
+    active = Math.max(0, Math.min(active, count - 1));
+    syncName(); renderModebar(); refreshSchema();
+    update("text");
+  });
 
-    $("#btn-classify").addEventListener("click", () => setMode("classify"));
-    $("#btn-cancel").addEventListener("click", () => setMode("browse"));
-    $("#btn-submit").addEventListener("click", e => {
-      const status = $("#status");
-      if (problems().length) {
-        e.preventDefault();
-        status.classList.add("is-alert");
-        if (!draft.name.trim()) $("#f-name").focus();
-        return;
-      }
-      if (!REPO) {
-        e.preventDefault();
-        status.textContent = "Repository unknown here. Use Copy record instead.";
-        status.classList.add("is-alert");
-      }
-    });
-    $("#btn-reset").addEventListener("click", () => {
-      draft = emptyDraft(); active = 0;
-      $("#f-name").value = "";
-      $("#json-out").hidden = true;
-      renderModebar(); refreshChips(); updateEntry();
-    });
-    $("#btn-copy").addEventListener("click", () => {
-      const btn = $("#btn-copy"), text = $("#json-out").textContent;
-      const done = msg => { btn.textContent = msg; setTimeout(() => (btn.textContent = "Copy record"), 2000); };
-      const fallback = () => {
-        const pre = $("#json-out"); pre.hidden = false;
-        const r = document.createRange(); r.selectNodeContents(pre);
-        const s = getSelection(); s.removeAllRanges(); s.addRange(r);
-        done("Selected, press Ctrl/Cmd + C");
-      };
-      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(() => done("Copied"), fallback);
-      else fallback();
-    });
-  }
+  $("#search").addEventListener("input", e => { query = e.target.value.trim().toLowerCase(); renderTools(); });
+  $("#btn-clear").addEventListener("click", () => {
+    Object.keys(filters).forEach(k => delete filters[k]);
+    query = ""; $("#search").value = "";
+    refreshSchema(); renderTools();
+  });
 
-  init();
-})();
+  $("#btn-classify").addEventListener("click", () => setMode("classify"));
+  $("#btn-cancel").addEventListener("click", () => setMode("browse"));
+  $("#btn-reset").addEventListener("click", () => {
+    record = emptyRecord(); active = 0; loadedId = null;
+    $("#f-name").value = "";
+    renderModebar(); formChanged();
+  });
+  $("#btn-copy").addEventListener("click", () => {
+    const btn = $("#btn-copy");
+    const ok = copyNow($("#record-text").value);
+    if (!ok) { view = "text"; updateUI(); $("#record-text").select(); }
+    btn.textContent = ok ? "Copied" : "Selected, press Ctrl/Cmd + C";
+    setTimeout(() => (btn.textContent = "Copy record"), 2000);
+  });
+  $("#btn-submit").addEventListener("click", e => {
+    const status = $("#status");
+    if (textError || problems.length) {
+      e.preventDefault();
+      status.classList.add("is-alert");
+      if (!(typeof record.name === "string" && record.name.trim())) $("#f-name").focus();
+      return;
+    }
+    if (!REPO) {
+      e.preventDefault();
+      status.textContent = "Repository unknown here. Use Copy record instead.";
+      status.classList.add("is-alert");
+      return;
+    }
+    const target = submitTarget();
+    const copied = copyNow(formatRecord(record));
+    status.textContent = target.update
+      ? (copied ? "GitHub opened in a new tab. Replace the file content with the record on your clipboard." : "GitHub opened in a new tab. Use Copy record, then replace the file content.")
+      : target.prefilled
+        ? (copied ? "GitHub opened in a new tab. If the file is empty there, paste the record from your clipboard." : "GitHub opened in a new tab.")
+        : (copied ? "GitHub opened in a new tab. Paste the record from your clipboard into the file." : "GitHub opened in a new tab. Use Copy record and paste it into the file.");
+  });
+}
+
+init();
 </script>
 </body>
 </html>
