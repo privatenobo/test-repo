@@ -1,7 +1,6 @@
 {
   "name": "A.I. Duet",
   "url": "https://experiments.withgoogle.com/ai-duet",
-  "status": "example",
   "modes": [
     {
       "name": "Duet",
