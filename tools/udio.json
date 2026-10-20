@@ -1,7 +1,7 @@
 {
   "name": "Udio",
   "url": "https://www.udio.com",
-  "status": "approved",
+  "status": "example",
   "modes": [
     {
       "name": "Create song",
