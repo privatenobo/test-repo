@@ -1,7 +1,12 @@
-name: Check tools
+name: Check changes
+
+# Runs only for pull requests that change more than tools/ (schema, website, scripts).
+# These are merged by hand. Pull requests that only change tools/ are handled by auto-merge.yml.
 
 on:
   pull_request:
+    paths-ignore:
+      - "tools/**"
   workflow_dispatch:
 
 permissions:
@@ -12,5 +17,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Check every file in tools/
+      - name: Check schema and every file in tools/
         run: node scripts/build.mjs --check
