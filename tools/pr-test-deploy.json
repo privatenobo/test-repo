@@ -1,0 +1,1 @@
+{"name":"PR Test Deploy","modes":[{"name":"PR Test","input_type":["text_prompt"],"chronological":true,"output_type":["score"],"interaction":"accompanies","length":{"unit":"unlimited"},"realtime":true}]}
