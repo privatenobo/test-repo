@@ -1,0 +1,58 @@
+name: Check and merge tools
+
+# Runs on every pull request, including those from forks.
+# Pull requests that only add or edit files in tools/ are checked and,
+# if the check passes, merged automatically. Everything else waits for a maintainer.
+# Safety: the scripts come from main. Files from the pull request are only read as data.
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+
+concurrency:
+  group: tools-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  tools:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PR: ${{ github.event.pull_request.number }}
+      HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Take the tool files from the pull request
+        id: files
+        run: |
+          gh api "repos/$GITHUB_REPOSITORY/pulls/$PR/files" --paginate --jq '.[] | "\(.status) \(.filename)"' > "$RUNNER_TEMP/files.txt"
+          git fetch --no-tags --depth=1 origin "$HEAD_SHA"
+          node scripts/pr-files.mjs "$RUNNER_TEMP/files.txt" "$HEAD_SHA"
+
+      - name: Check every file in tools/
+        id: check
+        if: steps.files.outputs.auto == 'true'
+        env:
+          REPORT_FILE: ${{ runner.temp }}/report.md
+        run: node scripts/build.mjs --check
+
+      - name: Merge and update the site
+        if: steps.files.outputs.auto == 'true'
+        run: |
+          gh pr merge "$PR" --squash --match-head-commit "$HEAD_SHA"
+          gh workflow run deploy.yml --ref main
+
+      - name: Report problems
+        if: always() && steps.check.outcome == 'failure'
+        run: gh pr comment "$PR" --body-file "$RUNNER_TEMP/report.md"
+
+      - name: Ask for review
+        if: steps.files.outputs.auto == 'false' && github.event.pull_request.author_association != 'OWNER'
+        run: gh pr comment "$PR" --body "Thanks! This pull request changes more than new or edited files in tools/, so a maintainer will review it."
