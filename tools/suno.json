@@ -1,7 +1,6 @@
 {
   "name": "Suno",
   "url": "https://suno.com",
-  "status": "example",
   "modes": [
     {
       "name": "Create song",
