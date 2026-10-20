@@ -30,7 +30,7 @@
       "dimensions": [
         { "id": "output_type", "label": "Type", "short": "Output", "kind": "multi", "values": ["lyrics", "score", "performance_midi", "audio"] },
         { "id": "interaction", "label": "Interaction with input", "short": "Interaction", "kind": "single", "values": ["accompanies", "precedes", "altered_version", "no_direct_connection"] },
-        { "id": "length", "label": "Length", "short": "Length", "kind": "length", "values": ["beats", "seconds", "unlimited"], "def": "Maximum length of one output." }
+        { "id": "length", "label": "Length", "short": "Length", "kind": "length", "optional": true, "values": ["beats", "seconds", "unlimited"], "def": "Maximum length of one output. Leave empty if unknown." }
       ]
     },
     {
