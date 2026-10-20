@@ -72,10 +72,11 @@ const summary = problems.length
   ? `Found ${problems.length} problem${problems.length > 1 ? "s" : ""}.`
   : `All ${fileCount} tool file${fileCount === 1 ? "" : "s"} are valid.`;
 console.log(summary);
-if (process.env.GITHUB_STEP_SUMMARY) {
-  const lines = problems.map(p => `- \`${p.file}\`${p.line ? ` line ${p.line}` : ""}: ${p.message}`);
-  appendFileSync(process.env.GITHUB_STEP_SUMMARY, [`### Tool check`, "", `**${summary}**`, "", ...lines, ""].join("\n"));
-}
+const markdown = ["### Tool check", "", `**${summary}**`, "",
+  ...problems.map(p => `- \`${p.file}\`${p.line ? ` line ${p.line}` : ""}: ${p.message}`), ""].join("\n");
+if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, markdown);
+// Used for the comment on the pull request.
+if (process.env.REPORT_FILE) writeFileSync(process.env.REPORT_FILE, markdown + "\nPlease fix the file in this pull request. The check runs again after every change.\n");
 if (problems.length) process.exit(1);
 
 // Build
