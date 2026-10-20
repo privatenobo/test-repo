@@ -1,0 +1,16 @@
+{
+  "name": "Udio",
+  "url": "https://www.udio.com",
+  "status": "approved",
+  "modes": [
+    {
+      "name": "Create song",
+      "input_type": ["text_prompt", "tags_features", "lyrics"],
+      "chronological": false,
+      "output_type": ["audio"],
+      "interaction": "no_direct_connection",
+      "length": null,
+      "realtime": false
+    }
+  ]
+}
