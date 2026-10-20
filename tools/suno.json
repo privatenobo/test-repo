@@ -1,0 +1,25 @@
+{
+  "name": "Suno",
+  "url": "https://suno.com",
+  "status": "example",
+  "modes": [
+    {
+      "name": "Create song",
+      "input_type": ["text_prompt", "tags_features", "lyrics"],
+      "chronological": false,
+      "output_type": ["audio"],
+      "interaction": "no_direct_connection",
+      "length": { "unit": "seconds", "value": 480 },
+      "realtime": false
+    },
+    {
+      "name": "Cover",
+      "input_type": ["tags_features", "audio"],
+      "chronological": true,
+      "output_type": ["audio"],
+      "interaction": "altered_version",
+      "length": null,
+      "realtime": false
+    }
+  ]
+}
