@@ -1,0 +1,16 @@
+{
+  "name": "A.I. Duet",
+  "url": "https://experiments.withgoogle.com/ai-duet",
+  "status": "approved",
+  "modes": [
+    {
+      "name": "Duet",
+      "input_type": ["performance_midi"],
+      "chronological": false,
+      "output_type": ["performance_midi"],
+      "interaction": "precedes",
+      "length": null,
+      "realtime": true
+    }
+  ]
+}
