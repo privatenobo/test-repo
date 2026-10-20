@@ -1,0 +1,1 @@
+{"name":"Auto Merge Test","modes":[{"name":"auto test","input_type":["text_prompt"],"chronological":false,"output_type":["score"],"interaction":"precedes","length":{"unit":"unlimited"},"realtime":false}]}
