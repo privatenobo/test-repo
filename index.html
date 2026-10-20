@@ -141,7 +141,7 @@ h1{font:500 clamp(1.7rem,2.3vw,2.4rem)/1 var(--sans);letter-spacing:.01em;text-t
       <dl class="how-list">
         <dt>Schema</dt><dd>Each tool is described by its input, its output and other features. A tool with several functions gets one mode per function.</dd>
         <dt>Browse</dt><dd>Click properties in the schema to filter the tools.</dd>
-        <dt>Contribute</dt><dd>Each tool is one JSON file. Add or change one through a pull request, with the form or as text. An automatic check validates it. After the merge, this site updates.</dd>
+        <dt>Contribute</dt><dd>Each tool is one JSON file. Add or change one through a pull request, with the form or as text. An automatic check validates it; if it passes, it is merged and this site updates within minutes.</dd>
       </dl>
     </section>
 
@@ -160,7 +160,7 @@ h1{font:500 clamp(1.7rem,2.3vw,2.4rem)/1 var(--sans);letter-spacing:.01em;text-t
           <p class="notice" id="existing" hidden></p>
           <p class="status" id="status" aria-live="polite"></p>
           <a class="btn is-muted" id="btn-submit" href="#" target="_blank" rel="noopener">Submit as pull request</a>
-          <p class="note">On GitHub: Commit or Propose changes, then Create pull request. Requires a free GitHub account; your username is shown publicly.</p>
+          <p class="note">On GitHub: Commit or Propose changes, then Create pull request. If the check passes, it is merged automatically. Requires a free GitHub account; your username is shown publicly.</p>
           <div class="links">
             <button type="button" class="link" id="btn-cancel">Cancel</button>
             <button type="button" class="link" id="btn-reset">Start over</button>
@@ -469,7 +469,7 @@ function renderCheck() {
     box.innerHTML = `<p class="check-head"><b>check</b> ${problems.length} problem${problems.length > 1 ? "s" : ""}</p>
       <ul class="check-list">${problems.map(p => `<li>${esc(p)}</li>`).join("")}</ul>`;
   } else {
-    box.innerHTML = `<p class="check-head"><b>check</b> Passed. The same check runs on the pull request.</p>`;
+    box.innerHTML = `<p class="check-head"><b>check</b> Passed. The same check runs on the pull request and merges it.</p>`;
   }
 }
 function syncText() {
