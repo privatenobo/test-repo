@@ -1,0 +1,16 @@
+name: Check tools
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check every file in tools/
+        run: node scripts/build.mjs --check
