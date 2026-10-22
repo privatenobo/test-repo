@@ -1,0 +1,1 @@
+{"name":"Andrew test","modes":[{"name":"default","input_type":["performance_midi","tags_features"],"chronological":true,"output_type":["audio"],"interaction":"accompanies","length":{"unit":"seconds","value":200},"realtime":false}]}
