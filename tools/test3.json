@@ -1,0 +1,1 @@
+{"name":"Test3","modes":[{"name":"Create Lyrics","input_type":["text_prompt"],"chronological":false,"output_type":["lyrics"],"interaction":"precedes","length":{"unit":"seconds","value":45},"realtime":false}]}
