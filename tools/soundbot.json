@@ -1,0 +1,14 @@
+{
+  "name": "Neuer Test",
+  "modes": [
+    {
+      "name": "sound synthesis",
+      "input_type": ["lyrics"],
+      "chronological": true,
+      "output_type": ["audio"],
+      "interaction": "accompanies",
+      "length": { "unit": "unlimited" },
+      "realtime": false
+    }
+  ]
+}
